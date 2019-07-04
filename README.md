@@ -6,7 +6,8 @@ included with the data base of the App (most important is the API level in  Freq
 trying to explain what I did)
 
 at this time, it works well running on my phone and android emulator, but maybe we will have to throw away some of the animations because it can 
-do some version problems at compile time. so dont hesitate to delete some of them from Main activity..
+do some version problems at compile time. so dont hesitate to delete some of them from Main activity.. Most of the animation I took from https://mindorks.com/android/store/Animations
+
 
 points to take care of
 1.think how to deal with large amount of types and signs. almost impossible to show all of them on settings menu... 
