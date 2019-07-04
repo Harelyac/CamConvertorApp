@@ -14,7 +14,6 @@ points to take care of
 maybe load from DB on cloud or web server
 ... meanwhile, I added all of the conversion types (frequencies) by hand from site https://unicode-table.com/en/#0073
 
-2.see the API for Room sqlite which stores all the user's types (given as Object of 3 fields:type, source (sign), target (sign) 
-in FrequenciesViewModel class and AppDataBase class
+2.see the API for Room sqlite which stores all the user's types (given as Object of 3 fields : type , source frequency (sign), target frequency (sign)) in FrequenciesViewModel.class and AppDataBase class
 
 
