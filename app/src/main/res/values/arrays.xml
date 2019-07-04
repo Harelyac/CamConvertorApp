@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name="currencies">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>Dollar ($)</item>
+        <item>Cent (&#162;)</item>
+        <item>Pound (&#163;)</item>
+        <item>Yen (&#165;)</item>
+        <item>Rial (&#65020;)</item>
+        <item>Euro (&#8364;)</item>
+        <item>NIS (&#8362;)</item>
+        <item>lIRA (&#8356;)</item>
+        <item>NIS (&#8362;)</item>
+        <item>NIS (&#8362;)</item>
+    </string-array>
+
+    <string-array name="temperature">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>degree Celsius (&#8451;)</item>
+        <item>degree Fahrenheit (&#8457;)</item>
+        <item>degree Rankine </item>
+        <item>degree Reaumur </item>
+        <item>degree kelvin (&#8490;)</item>
+
+    </string-array>
+
+
+    <string-array name="length">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>kilometer (km)</item>
+        <item>meter (m)</item>
+        <item>decimeter (dm)</item>
+        <item>centimeter (cm)</item>
+        <item>milimeter (mm)</item>
+        <item>micrometer (&#181;m)</item>
+        <item>Angstram (&#8491;)</item>
+        <item>Mile (mi)</item>
+        <item>Yard (yd)</item>
+        <item>Foot (ft)</item>
+        <item>Inch (in)</item>
+
+    </string-array>
+
+
+    <string-array name="weights">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+
+
+    <string-array name="volume">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+    <string-array name="pressure">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+
+    <string-array name="time">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+
+    <string-array name="speed">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+
+    <string-array name="angle">
+        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+        <item>update</item>
+
+    </string-array>
+    <string-array name="title">
+
+        <item>help</item>
+
+        <item>about us</item>
+
+        <item>settings</item>
+
+        <item>defaults types</item>
+
+        <item>supported types</item>
+
+        <item>sync currencies</item>
+
+        <item>write us</item>
+
+
+    </string-array>
+
+    <integer-array name="images">
+
+        <item>@android:drawable/ic_menu_camera</item>
+
+        <item>@drawable/currencies</item>
+
+        <item>@drawable/currencies2</item>
+
+        <item>@drawable/currencies3</item>
+
+        <item>@drawable/currencies4</item>
+
+        <item>@drawable/currencies5</item>
+
+        <item>@android:drawable/ic_menu_camera</item>
+
+        <item>@android:drawable/ic_menu_camera</item>
+
+        <item>@android:drawable/ic_menu_camera</item>
+
+
+        <item>@android:drawable/ic_menu_camera</item>
+
+    </integer-array>
+
+    <integer-array name="colors">
+
+
+        <item>@color/theme_purple_accent</item>
+
+        <item>@color/theme_green_primary</item>
+
+        <item>@color/theme_red_accent</item>
+
+        <item>@color/green</item>
+
+        <item>@color/theme_yellow_primary</item>
+
+        <item>@color/theme_yellow_accent</item>
+
+    </integer-array>
+</resources>
