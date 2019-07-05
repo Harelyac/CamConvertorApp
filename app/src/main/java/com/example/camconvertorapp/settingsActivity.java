@@ -4,15 +4,21 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,7 +28,10 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -32,6 +41,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import kotlin.Triple;
 
 public class settingsActivity extends FragmentActivity implements EffectAdapter.AdapterClickCallback {
 
@@ -88,12 +98,12 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         alert.show();
 
 
-
-
         //start with initializing local App DB -->
         db = AppDatabase.getDatabase(this);
 
         viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
+        String table = getTableAsString(db, "Frequency"); //todo debug
+//        deleteAll();// todo omit - only for debugging!!
 
 
         //noticing the viewModel all the frequencies which have been already stored
@@ -117,49 +127,83 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         mListView.setHasFixedSize(true);
 
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this ,RecyclerView.VERTICAL,
+                false);
         mListView.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
 
         EffectAdapter customAdapter = new EffectAdapter(typesForConversionList, flags);
         mListView.setAdapter(customAdapter);
+        customAdapter.callback = this;
 
 
 
 
-        //now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
-        Boolean hasNotInit = viewModel.setDefaultFreq();
-        if(hasNotInit == true)
+
+
+        Button but = findViewById(R.id.btnSubmit);
+        but.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
+
+                Toast.makeText(settingsActivity.this,
+                        "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
+                        Toast.LENGTH_LONG).show();
+
+                //now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
+
+                Boolean hasNotInit = viewModel.checkIfNotAllTypesSelectd();
+                if(hasNotInit == false && !viewModel.frequenciesMap.isEmpty())
+                {
+                    //the user didnt define all types conversions - notice him:
+                    alertDialog.setTitle("popup message");
+                    alertDialog.setMessage("you did not set all conversion types");
+                    alertDialog.setPositiveButton("USE DEFAULT TYPES", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            viewModel.setDefaultFreq();
+                            dialog.cancel();
+
+                        }
+                    });
+
+                    alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alert = alertDialog.create();
+
+                    alert.show();
+                }
+            }
+        });
+
+
+    }
+
+    public ArrayList<Triple<String,String,String>> getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
+        Triple<String,String, String> str ;
+        ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
+
+        String[] strs = (String[]) typesUpdated.keySet().toArray(new String[0]);
+        for(String type :  strs)
         {
-            //the user didnt define all types conversions - notice him:
-            alertDialog.setTitle("popup message");
-            alertDialog.setMessage("you did not set all conversion types");
-            alertDialog.setPositiveButton("USE DEFAULT TYPES", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                    dialog.cancel();
-
-                }
-            });
-
-            alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-             alert = alertDialog.create();
-
-            alert.show();
+            str =  new Triple<String, String, String>(type , typesUpdated.get(type).first , typesUpdated.get(type).second);
+            list.add(str);
 
 
         }
-
+        return list;
     }
 
     public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency){
@@ -174,7 +218,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         }
 
         if(type.equals("Weight")){
-            array = R.array.currencies;
+            array = R.array.weights;
             newFrequency.type = "Weight";
 
         }
@@ -217,9 +261,55 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         textView1.setText("choose the source " + type + " type:" );//TODO maybe change instruction
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+//        ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,array){
+//            @Override
+//            public boolean isEnabled(int position){
+//                if(position == 0)
+//                {
+//                    // Disable the first item from Spinner
+//                    // First item will be use for hint
+//                    return false;
+//                }
+//                else
+//                {
+//                    return true;
+//                }
+//            }
+//            @Override
+//            public View getDropDownView(int position, View convertView,
+//                                        ViewGroup parent) {
+//                View view = super.getDropDownView(position, convertView, parent);
+//                TextView tv = (TextView) view;
+//                if(position == 0){
+//                    // Set the hint text color gray
+//                    tv.setTextColor(Color.GRAY);
+//                }
+//                else {
+//                    tv.setTextColor(Color.BLACK);
+//                }
+//                return view;
+//            }
+//        };
+//
+//        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//
+//        mTarget.setAdapter(adapter1);
+
+
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mTarget.setAdapter(adapter);
+
+
+
+        //stop the animation
+        if (rope != null) {
+            rope.stop(true);
+        }
+        if (rope != null) {
+            rope.stop(true);
+        }
 
         mTarget.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -228,13 +318,15 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //                //first - delete the previous type was stored
 //                deleteAll(type);
                 String currency_selected_source = parent.getItemAtPosition(position).toString();
-                Toast.makeText(settingsActivity.this, currency_selected_source, Toast.LENGTH_SHORT).show();
+                Toast.makeText(settingsActivity.this,"Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
                 //save in ROOM sqlite as default currency TODO
                 newFrequency.source = currency_selected_source;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
+
             }
 
         });
@@ -243,8 +335,46 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         textView2.setText("choose the target " + type + " type:");//TODO maybe change instruction
 
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), R.array.currencies, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
+
+
+//        ArrayAdapter<CharSequence> adapter2 = new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,array){
+//            @Override
+//            public boolean isEnabled(int position){
+//                if(position == 0)
+//                {
+//                    // Disable the first item from Spinner
+//                    // First item will be use for hint
+//                    return false;
+//                }
+//                else
+//                {
+//                    return true;
+//                }
+//            }
+//            @Override
+//            public View getDropDownView(int position, View convertView,
+//                                        ViewGroup parent) {
+//                View view = super.getDropDownView(position, convertView, parent);
+//                TextView tv = (TextView) view;
+//                if(position == 0){
+//                    // Set the hint text color gray
+//                    tv.setTextColor(Color.GRAY);
+//                }
+//                else {
+//                    tv.setTextColor(Color.BLACK);
+//                }
+//                return view;
+//            }
+//        };
+//
+//        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//
+//        mTarget2.setAdapter(adapter2);
+
+
+
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         mTarget2.setAdapter(adapter2);
 
@@ -255,19 +385,23 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //                //first - delete the previous type was stored
 //                deleteMe(type);
                 String currency_selected_target = parent.getItemAtPosition(position).toString();
-                Toast.makeText(settingsActivity.this, currency_selected_target, Toast.LENGTH_SHORT).show();
+                Toast.makeText(settingsActivity.this,"Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
                 //save in ROOM sqlite as default target currency TODO
                 newFrequency.target = currency_selected_target;
+                if (newFrequency.source != null && newFrequency.target != null)
+                    insertToLocalDB(newFrequency);
 
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
+
             }
 
         });
 
-        insertToLocalDB(newFrequency);
+
 
     }
 
@@ -280,6 +414,10 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //    void deleteMe(String type){
 //        new deleteALLAsyncTask(db.freqDao()).execute(type);
 //    }
+
+    void deleteAll(){
+        new deleteALLAsyncTask(db.freqDao()).execute();
+    }
 
 
 
@@ -347,6 +485,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         if (typesForConversionList[(int) id].equals("Currency")) {
             setTypesSelected("Currency", textView, textView2, newFrequency );
         }
+        if (typesForConversionList[(int) id].equals("Weight")) {
+            setTypesSelected("Weight", textView, textView2, newFrequency );
+        }
         if(typesForConversionList[(int) id].equals("Temperature")) {
 
             setTypesSelected("Temperature", textView, textView2, newFrequency );
@@ -383,4 +524,26 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         }
     }
+
+
+    public String getTableAsString(AppDatabase db, String tableName) {
+        Log.d("DBtable", "getTableAsString called");
+        String tableString = String.format("Table %s:\n", tableName);
+        Cursor allRows  = db.query("SELECT * FROM " + tableName, null);
+        if (allRows.moveToFirst() ){
+            String[] columnNames = allRows.getColumnNames();
+            do {
+                for (String name: columnNames) {
+                    tableString += String.format("%s: %s\n", name,
+                            allRows.getString(allRows.getColumnIndex(name)));
+                }
+                tableString += "\n";
+
+            } while (allRows.moveToNext());
+        }
+        Log.d("DBTABLE ***************", tableString);
+
+        return tableString;
+    }
+
 }

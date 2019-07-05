@@ -12,7 +12,8 @@ import androidx.lifecycle.ViewModel;
 public class FrequenciesViewModel extends ViewModel {
     String typesForConversionList[] = {"Weight", "Currency", "Temperature", "Length", "volume" , "pressure", "time", "speed", "angle" };
 
-    public HashMap<String, Pair<String, String>> frequenciesMap; //stands for :{Frequency_Type: {source_type, target_type}}
+    public HashMap<String, Pair<String, String>> frequenciesMap = new HashMap<String, Pair<String, String>>();
+    //stands for :{Frequency_Type: {source_type, target_type}}
 
 
     /***use this method for processing part - given the frequency type and source sign
@@ -20,6 +21,20 @@ public class FrequenciesViewModel extends ViewModel {
     public String getTatgetBySourceType(String source , String FrequencyType)
     {
         return this.frequenciesMap.get(FrequencyType).second;
+    }
+
+    public HashMap<String, Pair<String, String>> getAllTypesStored(){
+
+        HashMap<String, Pair<String, String>> allSoredTypes = new HashMap<String, Pair<String, String>>();
+
+            for(String frequency:typesForConversionList)
+            {
+                if(this.frequenciesMap.containsKey(frequency))
+                {
+                    allSoredTypes.put(frequency,this.frequenciesMap.get(frequency));
+                }
+            }
+            return allSoredTypes;
     }
 
     public void setFrequenciesMap(List<Frequency> frequencyList )
@@ -30,11 +45,27 @@ public class FrequenciesViewModel extends ViewModel {
         }
     }
 
+    public boolean checkIfNotAllTypesSelectd() {
+        boolean isTrue = false;
+        for (String type : typesForConversionList) {
+            if (this.frequenciesMap == null) {
+                return true;
+            }
+            if (!this.frequenciesMap.containsKey(type)) {
+                isTrue = false;
+            }
 
-    /**in case the user forgot or started processing the camera without setting the desired
-     * source-target frequency's types - then set the default frequencies and notice him
-     * by pop-up alert message
-     * //TODO here can use user's location (needed permission) for getting the assumed desired types...**/
+
+        }
+        return isTrue;
+    }
+
+
+
+        /**in case the user forgot or started processing the camera without setting the desired
+         * source-target frequency's types - then set the default frequencies and notice him
+         * by pop-up alert message
+         * //TODO here can use user's location (needed permission) for getting the assumed desired types...**/
     public boolean setDefaultFreq(){
         boolean isTrue = false;
         for(String type: typesForConversionList)

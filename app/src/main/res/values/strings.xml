@@ -115,4 +115,30 @@
 
     <!--</string-array>-->
 
+    <string name="source_prompt">Choose a source type</string>
+
+    <string-array name="country_arrays">
+        <item></item>
+        <item> </item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+
+    <string name="target_prompt">Choose a target type</string>
+
+    <string-array name="country_arrays2">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+
 </resources>

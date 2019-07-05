@@ -22,7 +22,7 @@ import javax.xml.transform.Source;
             Frequency frequency =  mAsyntaskDao.findByType(frequencies[0].type);
 
             //first check if part of the fields of previous stored frequency have to be re- stored
-            if (frequencies[0].target == null || frequencies[0].source == null)
+            if ((frequencies[0].target == null || frequencies[0].source == null) && frequency != null)
             {
                 if (frequencies[0].target == null ){
                     frequencies[0].target = frequency.target;

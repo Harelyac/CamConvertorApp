@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:background="@color/theme_yellow_text"
+    android:background="@color/theme_blue_background"
     >
 
     <ImageView

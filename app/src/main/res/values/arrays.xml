@@ -5,6 +5,7 @@
     <string-array name="currencies">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
 
+        <item>Select an Item...</item>
         <item>Dollar ($)</item>
         <item>Cent (&#162;)</item>
         <item>Pound (&#163;)</item>
@@ -19,6 +20,7 @@
 
     <string-array name="temperature">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>degree Celsius (&#8451;)</item>
         <item>degree Fahrenheit (&#8457;)</item>
@@ -31,6 +33,7 @@
 
     <string-array name="length">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>kilometer (km)</item>
         <item>meter (m)</item>
@@ -49,6 +52,7 @@
 
     <string-array name="weights">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
@@ -61,6 +65,7 @@
 
     <string-array name="volume">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
@@ -71,6 +76,7 @@
     </string-array>
     <string-array name="pressure">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
@@ -82,6 +88,7 @@
 
     <string-array name="time">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
@@ -93,6 +100,7 @@
 
     <string-array name="speed">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
@@ -104,6 +112,7 @@
 
     <string-array name="angle">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
+        <item>Select an Item...</item>
 
         <item>update</item>
         <item>update</item>
