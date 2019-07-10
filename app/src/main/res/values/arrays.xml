@@ -148,20 +148,21 @@
 
         <item>@drawable/currencies2</item>
 
-        <item>@drawable/currencies3</item>
+        <!--<item>@drawable/currencies3</item>-->
 
-        <item>@drawable/currencies4</item>
+        <!--<item>@drawable/currencies4</item>-->
 
-        <item>@drawable/currencies5</item>
-
-        <item>@android:drawable/ic_menu_camera</item>
+        <!--<item>@drawable/currencies5</item>-->
 
         <item>@android:drawable/ic_menu_camera</item>
 
         <item>@android:drawable/ic_menu_camera</item>
 
+        <item>@android:drawable/ic_menu_camera</item>
+
 
         <item>@android:drawable/ic_menu_camera</item>
+        <!--<item>@android:drawable/ic_menu_camera</item>-->
 
     </integer-array>
 
