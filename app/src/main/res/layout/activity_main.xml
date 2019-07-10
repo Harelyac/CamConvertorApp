@@ -169,19 +169,19 @@
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
+        android:layout_marginStart="55dp"
         android:layout_marginBottom="25dp"
         android:text="type here and start proccecing -->"
         android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="@color/light_grey"
-        android:textSize="17dp"
+        android:textSize="15dp"
         app:layout_constraintStart_toStartOf="@+id/fab"
         android:layout_gravity="bottom|start"
 
 
 
-    android:textStyle="bold|italic"
+        android:textStyle="normal|bold"
         android:visibility="visible" />
 
 </FrameLayout>
