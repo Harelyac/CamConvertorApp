@@ -70,6 +70,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/text_dark"
+
     xmlns:tools="http://schemas.android.com/tools"
     >
     <androidx.appcompat.widget.Toolbar
@@ -77,7 +79,7 @@
     style="@style/MaterialAnimations.TextAppearance.Title"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    android:background="@color/material_animations_primary"
+    android:background="@color/text_dark"
     android:elevation="@dimen/elevation_header"/>
 
         <TextView
@@ -92,14 +94,17 @@
     <nl.dionsegijn.konfetti.KonfettiView
         android:id="@+id/viewKonfetti"
         android:layout_width="match_parent"
-        android:layout_height="380dp" />
+        android:layout_height="380dp"
+        />
 
 
     <com.igalata.bubblepicker.rendering.BubblePicker
         android:id="@+id/picker"
         android:layout_width="409dp"
         android:layout_height="384dp"
-        app:backgroundColor="@android:color/white" />
+        app:backgroundColor="@color/text_dark"
+
+        />
     <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
         <!--android:id="@+id/fab"-->
         <!--android:layout_width="wrap_content"-->

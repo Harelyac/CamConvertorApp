@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.daimajia.androidanimations.library.Techniques;
+import com.eftimoff.androipathview.PathView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.igalata.bubblepicker.BubblePickerListener;
@@ -26,6 +27,8 @@ import nl.dionsegijn.konfetti.models.Shape;
 import nl.dionsegijn.konfetti.models.Size;
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.View;
@@ -48,6 +51,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
+
+//        PathView pathView= findViewById(R.id.pathView);
+//
+//        pathView.setSvgResource(R.raw.txtrecog);
+//        pathView.getSequentialPathAnimator() .delay(500)
+////                .duration(500)
+//                .interpolator(new AccelerateDecelerateInterpolator()) .start();
+//        pathView.useNaturalColors(); pathView.setFillAfter(true);
+
+//
+//        pathView.getSequentialPathAnimator()
+//                .delay(100)
+//                .duration(379)
+//////                .listenerStart(new AnimationListenerStart())
+//////                .listenerEnd(new AnimationListenerEnd())
+//                .interpolator(new AccelerateDecelerateInterpolator())
+//                .start();
+
+
+
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -110,16 +133,18 @@ public class MainActivity extends AppCompatActivity {
 //        animate.loop(true);
 
 
-        konfettiView.build()
-                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
-                .setDirection(0.0, 359.0)
-                .setSpeed(1f, 5f)
-                .setFadeOutEnabled(false)
-                .setTimeToLive(20000000L)
-                .addShapes(Shape.RECT, Shape.CIRCLE)
-                .addSizes(new Size(15, 7))
-                .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
-                .stream(300, 500000L);
+
+
+//        konfettiView.build()
+//                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+//                .setDirection(0.0, 359.0)
+//                .setSpeed(1f, 5f)
+//                .setFadeOutEnabled(false)
+//                .setTimeToLive(20000000L)
+//                .addShapes(Shape.RECT, Shape.CIRCLE)
+//                .addSizes(new Size(15, 7))
+//                .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
+//                .stream(300, 500000L);
 
         final String[] titles = getResources().getStringArray(R.array.title);
         final TypedArray colors = getResources().obtainTypedArray(R.array.colors);
@@ -141,13 +166,13 @@ public class MainActivity extends AppCompatActivity {
                         colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL));
 //                item.setTypeface(mediumTypeface);
                 item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.black));
-                item.setTextSize(60);
+                item.setTextSize(80);
                 item.setBackgroundImage(ContextCompat.getDrawable(MainActivity.this, images.getResourceId(position, 0)));
                 return item;
             }
         });
         bubblePicker.setCenterImmediately(true);
-        bubblePicker.setBubbleSize(30);
+        bubblePicker.setBubbleSize(58);
 
         bubblePicker.setListener(new BubblePickerListener() {
             @Override

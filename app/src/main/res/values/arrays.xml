@@ -180,5 +180,7 @@
 
         <item>@color/theme_yellow_accent</item>
 
+        <item>@color/theme_purple_primary_dark</item>
+
     </integer-array>
 </resources>
