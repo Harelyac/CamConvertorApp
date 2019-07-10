@@ -169,19 +169,19 @@
     <integer-array name="colors">
 
 
-        <item>@color/theme_purple_accent</item>
-
-        <item>@color/theme_green_primary</item>
-
-        <item>@color/theme_red_accent</item>
-
-        <item>@color/green</item>
-
-        <item>@color/theme_yellow_primary</item>
+        <item>@color/theme_yellow_accent</item>
 
         <item>@color/theme_yellow_accent</item>
 
-        <item>@color/theme_purple_primary_dark</item>
+        <item>@color/theme_yellow_accent</item>
+
+        <item>@color/theme_yellow_accent</item>
+
+        <item>@color/theme_yellow_accent</item>
+
+        <item>@color/theme_yellow_accent</item>
+
+        <item>@color/theme_yellow_accent</item>
 
     </integer-array>
 </resources>

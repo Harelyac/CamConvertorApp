@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
 
+        fab.setBackgroundResource(R.color.theme_yellow_accent);
+
 
 
         TextView text = findViewById(R.id.title1);
@@ -81,19 +83,19 @@ public class MainActivity extends AppCompatActivity {
 
 //        animate text
 
-        YoYo.with(Techniques.Tada)
-
-                .duration(1200)
-
-                .repeat(YoYo.INFINITE)
-
-                .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
-
-                .interpolate(new AccelerateDecelerateInterpolator())
-
-
-
-                .playOn(text);
+//        YoYo.with(Techniques.Tada)
+//
+//                .duration(1200)
+//
+//                .repeat(YoYo.INFINITE)
+//
+//                .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
+//
+//                .interpolate(new AccelerateDecelerateInterpolator())
+//
+//
+//
+//                .playOn(text);
 
         //animate fab
 
@@ -114,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
-        pulsator.start();
+//        PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
+//        pulsator.start();
 
 //        //todo here start the activity of the camera and text recognizer -->
         fab.setOnClickListener(new View.OnClickListener() {
@@ -164,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
                 item.setTitle(titles[position]);
                 item.setGradient(new BubbleGradient(colors.getColor((position * 2) % 8, 0),
                         colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL));
+
+                item.setGradient(new BubbleGradient(colors.getColor(position , 0),
+                        colors.getColor(position , 0), BubbleGradient.VERTICAL));
 //                item.setTypeface(mediumTypeface);
                 item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.black));
                 item.setTextSize(80);
