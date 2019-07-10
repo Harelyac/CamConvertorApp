@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-//        PathView pathView= findViewById(R.id.pathView);
+        PathView pathView= findViewById(R.id.path);
 //
 //        pathView.setSvgResource(R.raw.txtrecog);
 //        pathView.getSequentialPathAnimator() .delay(500)
@@ -61,13 +61,13 @@ public class MainActivity extends AppCompatActivity {
 //        pathView.useNaturalColors(); pathView.setFillAfter(true);
 
 //
-//        pathView.getSequentialPathAnimator()
-//                .delay(100)
+        pathView.getSequentialPathAnimator()
+                .delay(100)
 //                .duration(379)
-//////                .listenerStart(new AnimationListenerStart())
-//////                .listenerEnd(new AnimationListenerEnd())
-//                .interpolator(new AccelerateDecelerateInterpolator())
-//                .start();
+////                .listenerStart(new AnimationListenerStart())
+////                .listenerEnd(new AnimationListenerEnd())
+                .interpolator(new AccelerateDecelerateInterpolator())
+                .start();
 
 
 

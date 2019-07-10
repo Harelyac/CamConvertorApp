@@ -106,21 +106,20 @@
 
     </TextView>
 
-    <!--<com.eftimoff.androipathview.PathView xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--android:id="@+id/pathView"-->
-        <!--style="@style/MaterialAnimations.TextAppearance.Title.Inverse"-->
+    <com.eftimoff.androipathview.PathView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id = "@+id/path"
 
-        <!--android:layout_width="189dp"-->
-        <!--android:layout_height="180dp"-->
-        <!--android:layout_gravity="bottom|center"-->
-        <!--android:layout_marginBottom="50dp"-->
+        android:layout_width="189dp"
+        android:layout_height="180dp"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="33dp"
 
 
-        <!--android:visibility="visible"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/viewKonfetti"-->
-        <!--app:pathColor="@android:color/white"-->
-        <!--app:pathWidth="5dp"-->
-        <!--app:svg="@raw/txtrecog" />-->
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/viewKonfetti"
+        app:pathColor="@android:color/white"
+        app:pathWidth="5dp"
+        app:svg="@raw/camera" />
 
     <pl.bclogic.pulsator4droid.library.PulsatorLayout
         android:id="@+id/pulsator"

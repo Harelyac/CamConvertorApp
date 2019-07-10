@@ -131,7 +131,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 false);
         mListView.setLayoutManager(layoutManager);
 
-        // specify an adapter (see also next example)
+        // specify an adapter
 
         EffectAdapter customAdapter = new EffectAdapter(typesForConversionList, flags);
         mListView.setAdapter(customAdapter);
@@ -191,19 +191,28 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
     }
 
-    public ArrayList<Triple<String,String,String>> getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
+    public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
         Triple<String,String, String> str ;
         ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
+        StringBuilder str2  = new StringBuilder();
 
         String[] strs = (String[]) typesUpdated.keySet().toArray(new String[0]);
         for(String type :  strs)
         {
+            str2.append("\n").append("type: " + type + "\n")
+                    .append("     -> source sign: " + typesUpdated.get(type).first )
+                    .append("\n")
+                    .append("     -> target sign: " +typesUpdated.get(type).second)
+                    .append("\n");
+
+
             str =  new Triple<String, String, String>(type , typesUpdated.get(type).first , typesUpdated.get(type).second);
             list.add(str);
 
 
         }
-        return list;
+//        return list;
+        return str2;
     }
 
     public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency){
@@ -260,9 +269,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         //select source currency and save on room
         textView1.setText("choose the source " + type + " type:" );//TODO maybe change instruction
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter =  ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
 
-//        ArrayAdapter<CharSequence> adapter1 = new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,array){
+//        ArrayAdapter adapter1 = new ArrayAdapter(this,android.R.layout.simple_spinner_item,array){
 //            @Override
 //            public boolean isEnabled(int position){
 //                if(position == 0)
@@ -295,10 +304,11 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //
 //        mTarget.setAdapter(adapter1);
-
+//
 
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         mTarget.setAdapter(adapter);
 
 
@@ -307,9 +317,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         if (rope != null) {
             rope.stop(true);
         }
-        if (rope != null) {
-            rope.stop(true);
-        }
+//        if (rope != null) {
+//            rope.stop(true);
+//        }
 
         mTarget.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -317,10 +327,17 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //                //first - delete the previous type was stored
 //                deleteAll(type);
+
                 String currency_selected_source = parent.getItemAtPosition(position).toString();
-                Toast.makeText(settingsActivity.this,"Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
-                //save in ROOM sqlite as default currency TODO
-                newFrequency.source = currency_selected_source;
+                if(currency_selected_source.equals("Select an Item...") || currency_selected_source.equals("update")){
+                    Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else {
+                    Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
+                    //save in ROOM sqlite as default currency TODO
+                    newFrequency.source = currency_selected_source;
+                }
             }
 
             @Override
@@ -385,11 +402,17 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //                //first - delete the previous type was stored
 //                deleteMe(type);
                 String currency_selected_target = parent.getItemAtPosition(position).toString();
-                Toast.makeText(settingsActivity.this,"Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
-                //save in ROOM sqlite as default target currency TODO
-                newFrequency.target = currency_selected_target;
-                if (newFrequency.source != null && newFrequency.target != null)
-                    insertToLocalDB(newFrequency);
+                if(currency_selected_target.equals("Select an Item...") || currency_selected_target.equals("update")){
+                    Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else {
+                    Toast.makeText(settingsActivity.this, "Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
+                    //save in ROOM sqlite as default target currency TODO
+                    newFrequency.target = currency_selected_target;
+                    if (newFrequency.source != null && newFrequency.target != null)
+                        insertToLocalDB(newFrequency);
+                }
 
             }
 
@@ -426,7 +449,8 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         if (hasFocus) {
 
-            rope = YoYo.with(Techniques.FadeIn).duration(1000).playOn(mTarget);// after start,just click mTarget view, rope is not init
+            rope = YoYo.with(Techniques.Tada).duration(1000).playOn(mTarget);// after start,just click mTarget view, rope is not init
+            rope = YoYo.with(Techniques.Tada).duration(1000).playOn(mTarget2);// after start,just click mTarget view, rope is not init
         }
     }
     @Override
@@ -463,20 +487,18 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             rope.stop(true);
         }
         Techniques technique = (Techniques) view.getTag();
-        rope = YoYo.with(technique)
+        rope = YoYo.with(technique.Tada)
                 .duration(1200)
-                .repeat(YoYo.INFINITE)
+                .repeat(2)
                 .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
                 .interpolate(new AccelerateDecelerateInterpolator())
                 .playOn(mTarget);
 
-        if (rope != null) {
-            rope.stop(true);
-        }
 
-        rope = YoYo.with(technique)
+
+        rope = YoYo.with(technique.Tada)
                 .duration(1200)
-                .repeat(YoYo.INFINITE)
+                .repeat(2)
                 .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
                 .interpolate(new AccelerateDecelerateInterpolator())
                 .playOn(mTarget2);
