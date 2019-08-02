@@ -28,6 +28,11 @@ dependencies {
     api "androidx.room:room-runtime:$room_version"
 
 //    implementation "androidx.room:room-runtime:$room_version"
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-beta01'
     annotationProcessor "androidx.room:room-compiler:$room_version"
@@ -51,4 +56,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+
+
+    // ML Kit dependencies
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-ml-vision:19.0.3'
+    implementation 'com.google.firebase:firebase-ml-model-interpreter:18.0.0'
+
+    // Retrofit2 and Gson dependencies for Fixer.io currency conversion rates.
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 }
+apply plugin: 'com.google.gms.google-services'

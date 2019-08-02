@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -148,9 +149,14 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             public void onClick(View v) {
                 HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
 
-                Toast.makeText(settingsActivity.this,
-                        "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(v, "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+
+
+//                Toast.makeText(settingsActivity.this,
+//                        "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
+//                        Toast.LENGTH_LONG).show();
 
                 //now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
 
