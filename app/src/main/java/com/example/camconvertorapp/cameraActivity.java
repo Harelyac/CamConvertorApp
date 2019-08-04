@@ -33,6 +33,7 @@ import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
 import kotlin.Triple;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,6 +79,8 @@ public class cameraActivity extends AppCompatActivity
         if (graphicOverlay == null) {
             Log.d(TAG, "graphicOverlay is null");
         }
+        viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
+
 
 
 

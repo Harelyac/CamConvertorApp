@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,43 +17,43 @@
         <!--app:layout_constraintTop_toTopOf="parent" />-->
 
 
-    <com.example.pricey.common.CameraSourcePreview
+    <com.example.camconvertorapp.cameraModule.CameraSourcePreview
         android:id="@+id/firePreview"
         android:layout_width="296dp"
         android:layout_height="396dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.example.pricey.common.GraphicOverlay
+        <com.example.camconvertorapp.cameraModule.GraphicOverlay
             android:id="@+id/fireFaceOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true" />
-    </com.example.pricey.common.CameraSourcePreview>
+    </com.example.camconvertorapp.cameraModule.CameraSourcePreview>
 
     <TextView
         android:id="@+id/entryText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="323dp"
+        android:layout_height="276dp"
         android:text="Convert recognised prices with rate:"
-        app:layout_constraintTop_toBottomOf="@id/firePreview"
         app:layout_constraintBottom_toTopOf="@+id/baseCurrency"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/conversionRate" />
+        app:layout_constraintRight_toLeftOf="@+id/conversionRate"
+        app:layout_constraintTop_toBottomOf="@id/firePreview" />
 
     <TextView
         android:id="@+id/conversionRate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1.0"
-        app:layout_constraintTop_toBottomOf="@id/firePreview"
         app:layout_constraintBottom_toTopOf="@+id/baseCurrency"
         app:layout_constraintLeft_toRightOf="@+id/entryText"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firePreview" />
 
     <TextView
         android:id="@+id/baseCurrency"
@@ -62,7 +63,8 @@
         app:layout_constraintTop_toBottomOf="@id/entryText"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="parent" />
+        app:layout_constraintRight_toLeftOf="parent"
+        />
 
     <!--<Spinner-->
         <!--android:id="@+id/baseSpinner"-->
@@ -94,4 +96,4 @@
 
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

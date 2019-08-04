@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1058839346007",
+    "firebase_url": "https://camconvertorapp.firebaseio.com",
+    "project_id": "camconvertorapp",
+    "storage_bucket": "camconvertorapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058839346007:android:04cac9640a02d9a6",
+        "android_client_info": {
+          "package_name": "com.example.camconvertorapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058839346007-v2ib77liui14v5ekppuak4cpm26cn4lm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN3ywaWdY76qBECpDx-OWyi1Y6elt4HnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058839346007-v2ib77liui14v5ekppuak4cpm26cn4lm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

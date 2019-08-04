@@ -129,6 +129,7 @@
     </string-array>
 
     <string name="target_prompt">Choose a target type</string>
+    <string name="title_activity_camera">title_activity_camera</string>
 
     <string-array name="country_arrays2">
         <item></item>
