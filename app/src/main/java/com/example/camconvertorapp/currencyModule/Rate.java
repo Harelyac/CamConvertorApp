@@ -34,6 +34,7 @@ public class Rate {
             targetRate = 1.0f;
         }
 
+        // return the conversion rate
         return targetRate / baseRate;
     }
 }

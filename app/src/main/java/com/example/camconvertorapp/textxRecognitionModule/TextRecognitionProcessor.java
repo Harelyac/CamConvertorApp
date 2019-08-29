@@ -14,11 +14,8 @@
 package com.example.camconvertorapp.textxRecognitionModule;
 
 import android.graphics.Bitmap;
-//import android.support.annotation.NonNull;
-//import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.camconvertorapp.VisionProcessorBase;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -28,8 +25,9 @@ import com.example.camconvertorapp.cameraModule.CameraImageGraphic;
 import com.example.camconvertorapp.cameraModule.FrameMetadata;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.VisionProcessorBase;
-
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -41,13 +39,17 @@ import androidx.annotation.Nullable;
 public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVisionText> {
 
     private static final String TAG = "TextRecProc";
-    private float conversionRate = 1.0f;
-    private float price = 0.0f ;
+    private static HashMap<String, HashSet> signs = new HashMap<String,HashSet>();// create hash map - key: unit type , value: set of all signs of that type
 
+    // initialize those values from the view model
+    private float conversionRate = 1.0f;
+    private float source_price = 0.0f ;
+    private float target_price = 0.0f ;
+    private String sign = "";
     private final FirebaseVisionTextRecognizer detector;
 
-
     public TextRecognitionProcessor() {
+
         detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
     }
 
@@ -84,14 +86,16 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                 List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
                 for (int k = 0; k < elements.size(); k++) {
 
-         //todo here use viewModel.getTargetBySourceType(String source , String FrequencyType)
-         // todo catching the source sign in elements and convert it to its target type
-
                     try {
-                        price = Float.parseFloat(elements.get(k).getText());
-                        price = price * conversionRate;
+                        source_price = Float.parseFloat(elements.get(k).getText());
+                        sign = elements.get(k+1).getText();
+
+                        // now check the conversion type based on sign using the hashtable (key = conversion type, value = all the sign representing unit types)
+                        // now identifiy target unit type using the getTatgetBySourceType(sign,conversion type)
+                        // now calculate the conversion rate
+                        target_price = source_price * conversionRate;
                         GraphicOverlay.Graphic textGraphic = new TextGraphic(graphicOverlay,
-                                String.valueOf(price), elements.get(k).getBoundingBox());
+                                String.valueOf(target_price), elements.get(k).getBoundingBox());
                         graphicOverlay.add(textGraphic);
                     } catch (NumberFormatException ex) {
                         // Not a float

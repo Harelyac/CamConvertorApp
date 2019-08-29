@@ -3,20 +3,12 @@ package com.example.camconvertorapp;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
-//import android.support.v4.app.ActivityCompat;
-//import android.support.v4.content.ContextCompat;
-//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.example.camconvertorapp.cameraModule.CameraSource;
 import com.example.camconvertorapp.cameraModule.CameraSourcePreview;
@@ -24,12 +16,10 @@ import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
 import com.example.camconvertorapp.textxRecognitionModule.TextRecognitionProcessor;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -69,6 +59,7 @@ public class cameraActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_activity);
 
+
         // Set camera source and overlay.
         Log.d(TAG, "onCreate");
         preview = (CameraSourcePreview) findViewById(R.id.firePreview);
@@ -82,9 +73,7 @@ public class cameraActivity extends AppCompatActivity
         viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
 
 
-
-
-        // Get currency rates.
+        //TODO Get currency rates - move to main activity
         fixerRate = (TextView) findViewById(R.id.conversionRate);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://data.fixer.io/")
@@ -119,26 +108,6 @@ public class cameraActivity extends AppCompatActivity
 
 
 
-//        // Create spinners for available currencies.
-//        Spinner spinnerBase = (Spinner) findViewById(R.id.baseSpinner);
-//        Spinner spinnerTarget = (Spinner) findViewById(R.id.targetSpinner);
-//        // Create an ArrayAdapter using the string array and a default spinner layout
-//        ArrayAdapter<CharSequence> adapterBase = ArrayAdapter.createFromResource(this,
-//                R.array.planets_array, android.R.layout.simple_spinner_item);
-//        ArrayAdapter<CharSequence> adapterTarget = ArrayAdapter.createFromResource(this,
-//                R.array.planets_array, android.R.layout.simple_spinner_item);
-//        // Specify the layout to use when the list of choices appears
-//        adapterBase.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        adapterTarget.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        // Apply the adapter to the spinner
-//        spinnerBase.setAdapter(adapterBase);
-//        spinnerTarget.setAdapter(adapterTarget);
-//        spinnerBase.setOnItemSelectedListener(this);
-//        spinnerTarget.setOnItemSelectedListener(this);
-
-
-
-
         if (fixerResponse != null) {
 
             HashMap<String, Pair<String, String>> allTypes = viewModel.getAllTypesStored();
@@ -154,10 +123,6 @@ public class cameraActivity extends AppCompatActivity
 
 
 
-
-
-
-
         // Check permissions and start camera.
         if (allPermissionsGranted()) {
             createCameraSource();
@@ -168,8 +133,7 @@ public class cameraActivity extends AppCompatActivity
     }
 
 
-
-
+    // use it just to notify the user about the chosen unit types
     public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
         Triple<String,String, String> str ;
         ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
@@ -312,29 +276,4 @@ public class cameraActivity extends AppCompatActivity
         return false;
     }
 
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        // An item was selected. You can retrieve the selected item using
-//        // parent.getItemAtPosition(pos)
-//        if (fixerResponse != null) {
-//            switch(parent.getId()) {
-//                case R.id.baseSpinner:
-//                    baseCurrency = parent.getItemAtPosition(position).toString();
-//                    conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
-//                    break;
-//                case R.id.targetSpinner:
-//                    targetCurrency = parent.getItemAtPosition(position).toString();
-//                    conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
-//                    break;
-//            }
-//
-//            textRecognitionProcessor.setConversionRate(conversionRate);
-//            fixerRate.setText(String.valueOf(conversionRate));
-//        }
-//    }
-//
-//    @Override
-//    public void onNothingSelected(AdapterView<?> parent) {
-//        // Do nothing.
-//    }
 }

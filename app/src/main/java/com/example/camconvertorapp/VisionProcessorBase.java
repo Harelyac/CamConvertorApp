@@ -18,15 +18,15 @@ import android.graphics.Bitmap;
 //import android.support.annotation.NonNull;
 //import android.support.annotation.Nullable;
 
+import com.example.camconvertorapp.cameraModule.BitmapUtils;
+import com.example.camconvertorapp.cameraModule.FrameMetadata;
+import com.example.camconvertorapp.cameraModule.GraphicOverlay;
+import com.example.camconvertorapp.cameraModule.VisionImageProcessor;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
-import com.example.camconvertorapp.cameraModule.BitmapUtils;
-import com.example.camconvertorapp.cameraModule.FrameMetadata;
-import com.example.camconvertorapp.cameraModule.GraphicOverlay;
-import com.example.camconvertorapp.cameraModule.VisionImageProcessor;
 
 import java.nio.ByteBuffer;
 

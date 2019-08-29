@@ -90,46 +90,4 @@ public class EffectAdapter extends RecyclerView.Adapter<EffectAdapter.MyViewHold
         }
 
 
-
-
-
-
-
-//PROBLEM: tried with ListView - problem with inflating the layout -->
-
-
-//    @Override
-//    public int getCount() {
-//        return frequencies.length;
-//
-//    }
-//    @Override
-//    public Object getItem(int position) {
-//
-//        return Techniques.values()[position].getAnimator();
-//    }
-//
-//    @Override
-//    public long getItemId(int position) {
-//
-//        return position;
-//    }
-//
-//
-//
-//    @Override
-//    public View getView(final int position, View convertView, ViewGroup parent) {
-//
-//        View v = inflter.inflate(R.layout.item,null);
-//        TextView t = (TextView)v.findViewById(R.id.list_item_text);
-//        ImageView im = (ImageView) v.findViewById(R.id.sample_icon);
-////        Object o = getItem(position);
-////        int start = o.getClass().getName().lastIndexOf(".") + 1;
-////        String name = o.getClass().getName().substring(start);
-//        im.setImageResource(images[position]);
-//        t.setText(frequencies[position]);
-//        v.setTag(Techniques.values()[position]);
-//        return v;
-//    }
-
 }

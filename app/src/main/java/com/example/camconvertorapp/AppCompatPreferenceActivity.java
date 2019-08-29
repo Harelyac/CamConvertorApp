@@ -1,5 +1,4 @@
 package com.example.camconvertorapp;
-
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

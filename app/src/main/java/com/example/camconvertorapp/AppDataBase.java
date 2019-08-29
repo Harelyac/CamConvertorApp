@@ -77,6 +77,7 @@ interface FreqDao extends Serializable {
     void delete(Frequency frequency);
 }
 
+// not relevant just instansiating the room db
 @Database(entities = {Frequency.class}, version = 1, exportSchema = false)
 abstract class AppDatabase extends RoomDatabase implements Serializable{
     public abstract FreqDao freqDao();

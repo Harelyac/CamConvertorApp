@@ -17,6 +17,7 @@ import javax.xml.transform.Source;
 
         }
 
+        // this part is because hazan didn't knw that update query existed in sql
         @Override
         protected Void doInBackground(Frequency... frequencies) {
             Frequency frequency =  mAsyntaskDao.findByType(frequencies[0].type);

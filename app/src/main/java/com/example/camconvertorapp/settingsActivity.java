@@ -104,7 +104,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
         String table = getTableAsString(db, "Frequency"); //todo debug
-//        deleteAll();// todo omit - only for debugging!!
+        deleteAll();// todo omit - only for debugging!
 
 
         //noticing the viewModel all the frequencies which have been already stored

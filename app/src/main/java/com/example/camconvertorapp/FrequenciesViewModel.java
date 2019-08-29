@@ -2,7 +2,6 @@ package com.example.camconvertorapp;
 
 import android.content.DialogInterface;
 import android.util.Pair;
-
 import java.util.HashMap;
 import java.util.List;
 
