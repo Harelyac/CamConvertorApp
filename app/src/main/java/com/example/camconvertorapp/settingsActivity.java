@@ -477,7 +477,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         if (id == R.id.action_settings) {
 
-            startActivity(new Intent(this, editActivity.class));
+           // startActivity(new Intent(this, editActivity.class));
 
             return true;
         }

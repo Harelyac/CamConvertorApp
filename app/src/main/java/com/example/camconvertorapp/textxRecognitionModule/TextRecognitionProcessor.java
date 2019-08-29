@@ -88,7 +88,9 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
 
                     try {
                         source_price = Float.parseFloat(elements.get(k).getText());
-                        sign = elements.get(k+1).getText();
+                        if(k < elements.size() - 1){
+                            sign = elements.get(k+1).getText();
+                        }
 
                         // now check the conversion type based on sign using the hashtable (key = conversion type, value = all the sign representing unit types)
                         // now identifiy target unit type using the getTatgetBySourceType(sign,conversion type)
