@@ -70,7 +70,7 @@ interface FreqDao extends Serializable {
     void deleteAll();
 
     @Query("DELETE FROM Frequency WHERE type LIKE :type_name")
-    void deleteMe(String type_name);
+    void deleteByType(String type_name);
 
     @Insert
     void insertAll(Frequency... frequencies);
@@ -78,6 +78,7 @@ interface FreqDao extends Serializable {
     @Delete
     void delete(Frequency frequency);
 }
+
 
 // instantiating the room db
 @Database(entities = {Frequency.class}, version = 1, exportSchema = false)

@@ -47,7 +47,7 @@ public class cameraActivity extends AppCompatActivity
     private float conversionRate = 1.0f;
 
     private TextRecognitionProcessor textRecognitionProcessor;
-    private TheViewModel viewModel;
+    private ViewModel viewModel;
 
     // MainActivity main OnCreate method.
     @Override
@@ -64,8 +64,10 @@ public class cameraActivity extends AppCompatActivity
         if (graphicOverlay == null) {
             Log.d(TAG, "graphicOverlay is null");
         }
-        viewModel = ViewModelProviders.of(this).get(TheViewModel.class);
 
+        // generate the object
+        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+        viewModel.initHashMap();
 
         fixerRate = (TextView) findViewById(R.id.conversionRate);
 

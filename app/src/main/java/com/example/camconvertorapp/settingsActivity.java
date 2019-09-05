@@ -47,7 +47,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     int flags[] = {R.drawable.weight_icon, R.drawable.currency_icon, R.drawable.temperature_icon, R.drawable.length_icon, R.drawable.volume_icon, R.drawable.pressure_icon,R.drawable.time_icon,R.drawable.speed,R.drawable.angle_icon};
     String typesForConversionList[] = {"Weight", "Currency", "Temperature", "Length", "volume" , "pressure", "time", "speed", "angle" };
     public AppDatabase db;
-    public TheViewModel viewModel;
+    public ViewModel viewModel;
     private RecyclerView.LayoutManager layoutManager;
     TextView textView ;
     TextView textView2 ;
@@ -61,17 +61,15 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         textView = findViewById(R.id.textView);
         textView2 = findViewById(R.id.textView2);
 
-        //if its the first time the user come in - help pop up
+        // if its the first time the user come in - help pop up
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
         alertDialog.setTitle("Hi! Here we Go!");
-        alertDialog.setMessage("select conversion types from the list\n then choose the source and target sign");
+        alertDialog.setMessage("select conversion types from the list\nthen choose the source and target sign");
         alertDialog.setPositiveButton("Got It", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 dialog.cancel();
-
             }
         });
 
@@ -79,23 +77,21 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //TODO send the user to Help Activity for further explanations and use cases
+                // TODO send the user to Help Activity for further explanations and use cases
                 dialog.cancel();
             }
         });
-
         AlertDialog alert = alertDialog.create();
-
         alert.show();
 
 
         // start with initializing local App DB
         db = AppDatabase.getDatabase(this);
 
-        viewModel = ViewModelProviders.of(this).get(TheViewModel.class);
+        // init view model
+        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
 
-
-        //noticing the viewModel all the frequencies which have been already stored
+        // noticing the viewModel all the frequencies which have been already stored
         db.freqDao().getAll().observe(this, new Observer<List<Frequency>>() {
             @Override
             public void onChanged(@Nullable final List<Frequency> frequencies) {
@@ -121,37 +117,33 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         mListView.setLayoutManager(layoutManager);
 
         // specify an adapter
-
         EffectAdapter customAdapter = new EffectAdapter(typesForConversionList, flags);
         mListView.setAdapter(customAdapter);
         customAdapter.callback = this;
 
-
-
-
-
-
+        // when submit is clicked
         Button but = findViewById(R.id.btnSubmit);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // debug -->
+                getTableAsString(db,"Frequency");
+
                 HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
 
                 Snackbar.make(v, "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
+               Toast.makeText(settingsActivity.this,"Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
+                        Toast.LENGTH_LONG).show();
 
-
-//                Toast.makeText(settingsActivity.this,
-//                        "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
-//                        Toast.LENGTH_LONG).show();
-
-                //now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
+                // now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
 
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
 
-                Boolean hasNotInit = viewModel.checkIfNotAllTypesSelectd();
-                if(hasNotInit == false && !viewModel.frequenciesMap.isEmpty())
+                boolean hasNotInit = viewModel.checkIfNotAllTypesSelected();
+                if(!hasNotInit && !ViewModel.frequenciesMap.isEmpty())
                 {
                     //the user didnt define all types conversions - notice him:
                     alertDialog.setTitle("popup message");
@@ -163,7 +155,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
                             viewModel.setDefaultFreq();
                             dialog.cancel();
-
                         }
                     });
 
@@ -185,6 +176,8 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
     }
 
+
+    // maybe for debug purposes
     public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
         Triple<String,String, String> str ;
         ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
@@ -209,12 +202,13 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         return str2;
     }
 
+
+    // create a frequency with the given input from user and then put it into the room db.
     public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency){
-        /** this function get the relevant frequencies which were set by the user via Spinner1 and Spinner2
-         * and save it in local Room DB**/
         int array = 0;
 
-        if(type.equals("Currency")){
+        if(type.equals("Currency"))
+        {
             array = R.array.currencies;
             newFrequency.type = "Currency";
 
@@ -260,6 +254,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             newFrequency.type = "angle";
 
         }
+
         //select source currency and save on room
         textView1.setText("choose the source " + type + " type:" );//TODO maybe change instruction
 
@@ -394,7 +389,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //                //first - delete the previous type was stored
-//                deleteMe(type);
+//                deleteByType(type);
                 String currency_selected_target = parent.getItemAtPosition(position).toString();
                 if(currency_selected_target.equals("Select an Item...") || currency_selected_target.equals("update")){
                     Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
@@ -404,10 +399,8 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                     Toast.makeText(settingsActivity.this, "Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
                     //save in ROOM sqlite as default target currency TODO
                     newFrequency.target = currency_selected_target;
-                    if (newFrequency.source != null && newFrequency.target != null)
-                        insertToLocalDB(newFrequency);
+                    insertToLocalDB(newFrequency);
                 }
-
             }
 
             @Override
@@ -423,12 +416,12 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     }
 
 
-    /***these methods manage the insertion and deletion from room db**/
+    /**these methods manage the insertion and deletion from room db**/
     void insertToLocalDB(Frequency newFrequency) {
         new insertLocalAsyncTask(db.freqDao()).execute(newFrequency);
     }
 
-//    void deleteMe(String type){
+//    void deleteByType(String type){
 //        new deleteALLAsyncTask(db.freqDao()).execute(type);
 //    }
 
@@ -541,7 +534,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         }
     }
 
-
+    // debug purposes - check current types stored on room db
     public String getTableAsString(AppDatabase db, String tableName) {
         Log.d("DBtable", "getTableAsString called");
         String tableString = String.format("Table %s:\n", tableName);

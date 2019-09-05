@@ -16,7 +16,8 @@ package com.example.camconvertorapp.textxRecognitionModule;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.example.camconvertorapp.TheViewModel;
+import com.example.camconvertorapp.ViewModel;
+import com.example.camconvertorapp.currencyModule.Rate;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -27,8 +28,7 @@ import com.example.camconvertorapp.cameraModule.FrameMetadata;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.VisionProcessorBase;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -40,20 +40,21 @@ import androidx.annotation.Nullable;
 public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVisionText> {
 
     private static final String TAG = "TextRecProc";
-    private static HashMap<String, String> CoversionTypeToSign = new HashMap<String,String>();// create hash map - key: unit type , value: set of all signs of that type
 
     // initialize those values from the view model
     private double conversionRate = 1.0f;
     private double source_price = 0.0f ;
     private double target_price = 0.0f ;
     private String source_sign = "";
+    private String target_sign = "";
+    private String conversion_type = "";
     private final FirebaseVisionTextRecognizer detector;
-    public TheViewModel viewModel;
+
 
     public TextRecognitionProcessor() {
 
         detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-        CoversionTypeToSign.put("Currency","$");
+     //   CoversionTypeToSign.put("Currency","$");
     }
 
     @Override
@@ -94,18 +95,53 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                         if(k < elements.size() - 1){
                             source_sign = elements.get(k+1).getText();
                         }
-                        // check the conversion type based on source sign
 
-                        // calculate the conversion rate based on source and target related to the conversion type
-                        if (source_sign.equals("$")){
-                            target_price = source_price * 3.33;
-                        }
+                        /*if (source_sign != null && source_sign != null)
+                        {
+                            outer:
+                            // check the conversion type based on source sign
+                            for (String key : ViewModel.ConversionTypeToSigns.keySet())
+                            {
+                                for (String sign : ViewModel.ConversionTypeToSigns.get(key))
+                                {
+                                    if (sign.equals(source_sign))
+                                    {
+                                        conversion_type = key;
+                                        break outer;
+                                    }
+                                }
+                            }
+                        }*/
 
+
+                     /*   // check
+                        target_sign = ViewModel.getTargetByFrequencyType(conversion_type);
+
+                        if (target_sign != null)
+                        {
+                            // check if the source identified is not what actually being configured on room
+                            if (!source_sign.equals(ViewModel.getSourceByFrequencyType(conversion_type)))
+                            {
+                                continue;
+                            }
+
+                            conversionRate = Rate.getConversionRate(source_sign,target_sign);
+
+                            target_price = source_price * conversionRate;
+
+                            // output the target price concatenated with the target sign
+                            GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
+                                    String.valueOf(target_price) + target_sign, elements.get(k).getBoundingBox());
+                            graphicOverlay.add(priceGraphic);
+                        }*/
+
+                        // output the target price concatenated with the target sign
                         GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
-                                String.valueOf(target_price) + "NIS", elements.get(k).getBoundingBox());
+                                String.valueOf(source_price) + source_sign, elements.get(k).getBoundingBox());
                         graphicOverlay.add(priceGraphic);
 
-                    } catch (NumberFormatException ex) {
+                    }
+                    catch (NumberFormatException ex) {
                         // Not a float
                     }
                     // clear target price
