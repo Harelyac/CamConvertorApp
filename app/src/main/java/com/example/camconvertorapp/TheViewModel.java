@@ -1,46 +1,42 @@
 package com.example.camconvertorapp;
-
-import android.content.DialogInterface;
 import android.util.Pair;
 import java.util.HashMap;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.ViewModel;
 
-public class FrequenciesViewModel extends ViewModel {
-    String typesForConversionList[] = {"Weight", "Currency", "Temperature", "Length", "volume" , "pressure", "time", "speed", "angle" };
+public class TheViewModel extends androidx.lifecycle.ViewModel {
+    String typesForConversionList[] = {"Currency", "Mass", "Temperature", "Length", "Volume" , "Pressure", "Time", "Angle" };
 
+    // stands for :{Frequency_Type: {source_type, target_type}}
     public HashMap<String, Pair<String, String>> frequenciesMap = new HashMap<String, Pair<String, String>>();
-    //stands for :{Frequency_Type: {source_type, target_type}}
 
 
-    /***use this method for processing part - given the frequency type and source sign
-     * from Camera  - look for the updated target type which the uer chose converting to**/
-    public String getTatgetBySourceType(String source , String FrequencyType)
+
+    // return target by conversion type
+    public String getTargetByFrequencyType(String FrequencyType)
     {
-        return this.frequenciesMap.get(FrequencyType).second;
+        return frequenciesMap.get(FrequencyType).second;
     }
 
     public HashMap<String, Pair<String, String>> getAllTypesStored(){
 
-        HashMap<String, Pair<String, String>> allSoredTypes = new HashMap<String, Pair<String, String>>();
+        HashMap<String, Pair<String, String>> allSortedTypes = new HashMap<String, Pair<String, String>>();
 
             for(String frequency:typesForConversionList)
             {
-                if(this.frequenciesMap.containsKey(frequency))
+                if(frequenciesMap.containsKey(frequency))
                 {
-                    allSoredTypes.put(frequency,this.frequenciesMap.get(frequency));
+                    allSortedTypes.put(frequency,this.frequenciesMap.get(frequency));
                 }
             }
-            return allSoredTypes;
+            return allSortedTypes;
     }
 
     public void setFrequenciesMap(List<Frequency> frequencyList )
     {
         for(Frequency frequency:frequencyList)
         {
-            this.frequenciesMap.put(frequency.type,new Pair<String, String>(frequency.source,frequency.target));
+            frequenciesMap.put(frequency.type,new Pair<String, String>(frequency.source,frequency.target));
         }
     }
 
@@ -64,7 +60,7 @@ public class FrequenciesViewModel extends ViewModel {
         /**in case the user forgot or started processing the camera without setting the desired
          * source-target frequency's types - then set the default frequencies and notice him
          * by pop-up alert message
-         * //TODO here can use user's location (needed permission) for getting the assumed desired types...**/
+         */
     public boolean setDefaultFreq(){
         boolean isTrue = false;
         for(String type: typesForConversionList)

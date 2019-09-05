@@ -9,13 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daimajia.androidanimations.library.Techniques;
-
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+/**
+ * recycler view adapter
+ */
 
 public class EffectAdapter extends RecyclerView.Adapter<EffectAdapter.MyViewHolder>  {
     interface AdapterClickCallback{

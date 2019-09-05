@@ -1,15 +1,12 @@
 package com.example.camconvertorapp;
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
-
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.camconvertorapp.cameraModule.CameraSource;
 import com.example.camconvertorapp.cameraModule.CameraSourcePreview;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
@@ -50,8 +47,7 @@ public class cameraActivity extends AppCompatActivity
     private float conversionRate = 1.0f;
 
     private TextRecognitionProcessor textRecognitionProcessor;
-
-    private FrequenciesViewModel viewModel;
+    private TheViewModel viewModel;
 
     // MainActivity main OnCreate method.
     @Override
@@ -59,9 +55,7 @@ public class cameraActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_activity);
 
-
         // Set camera source and overlay.
-        Log.d(TAG, "onCreate");
         preview = (CameraSourcePreview) findViewById(R.id.firePreview);
         if (preview == null) {
             Log.d(TAG, "Preview is null");
@@ -70,11 +64,11 @@ public class cameraActivity extends AppCompatActivity
         if (graphicOverlay == null) {
             Log.d(TAG, "graphicOverlay is null");
         }
-        viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(TheViewModel.class);
 
 
-        //TODO Get currency rates - move to main activity
         fixerRate = (TextView) findViewById(R.id.conversionRate);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://data.fixer.io/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -116,7 +110,6 @@ public class cameraActivity extends AppCompatActivity
             baseCurrency = allTypes.get("Currency").first;
             targetCurrency = allTypes.get("Currency").second;
             conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
-
             textRecognitionProcessor.setConversionRate(conversionRate);
             fixerRate.setText(String.valueOf(conversionRate));
         }

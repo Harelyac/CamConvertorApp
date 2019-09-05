@@ -1,11 +1,7 @@
 package com.example.camconvertorapp;
 
-import android.animation.Animator;
-import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -13,13 +9,11 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,16 +22,13 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,7 +47,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     int flags[] = {R.drawable.weight_icon, R.drawable.currency_icon, R.drawable.temperature_icon, R.drawable.length_icon, R.drawable.volume_icon, R.drawable.pressure_icon,R.drawable.time_icon,R.drawable.speed,R.drawable.angle_icon};
     String typesForConversionList[] = {"Weight", "Currency", "Temperature", "Length", "volume" , "pressure", "time", "speed", "angle" };
     public AppDatabase db;
-    public FrequenciesViewModel viewModel;
+    public TheViewModel viewModel;
     private RecyclerView.LayoutManager layoutManager;
     TextView textView ;
     TextView textView2 ;
@@ -71,7 +62,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         textView2 = findViewById(R.id.textView2);
 
         //if its the first time the user come in - help pop up
-
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
         alertDialog.setTitle("Hi! Here we Go!");
         alertDialog.setMessage("select conversion types from the list\n then choose the source and target sign");
@@ -99,12 +89,10 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         alert.show();
 
 
-        //start with initializing local App DB -->
+        // start with initializing local App DB
         db = AppDatabase.getDatabase(this);
 
-        viewModel = ViewModelProviders.of(this).get(FrequenciesViewModel.class);
-        String table = getTableAsString(db, "Frequency"); //todo debug
-        deleteAll();// todo omit - only for debugging!
+        viewModel = ViewModelProviders.of(this).get(TheViewModel.class);
 
 
         //noticing the viewModel all the frequencies which have been already stored

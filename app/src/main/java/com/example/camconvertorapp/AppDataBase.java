@@ -1,11 +1,7 @@
 package com.example.camconvertorapp;
-
-
 import android.content.Context;
-
 import java.io.Serializable;
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
@@ -18,8 +14,8 @@ import androidx.room.PrimaryKey;
 import androidx.room.Query;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import org.jetbrains.annotations.NotNull;
 
-/**building the Room local DB for selfChat*/
 
 @Entity
 class Frequency implements Serializable {
@@ -36,21 +32,27 @@ class Frequency implements Serializable {
     @NonNull public String target;
 
 
-
-    public void setType(String type){
-        this.type= type;
+    public void setType(@NotNull String type){
+        this.type = type;
     }
-    public void setSource(String source){
-        this.source= source;
+    public void setSource(@NotNull String source){
+        this.source = source;
     }
-    public void setTarget(String target){
-        this.target= target;
+    public void setTarget(@NotNull String target){
+        this.target = target;
     }
 
 
-    public String getType(){ return this.type; }
-    public String getSourceType(){ return this.source;}
-    public String getTargetType(){ return this.target;}
+    @NotNull
+    public String getType(){
+        return this.type;
+    }
+    public String getSourceType(){
+        return this.source;
+    }
+    public String getTargetType(){
+        return this.target;
+    }
 }
 
 @Dao
@@ -60,15 +62,15 @@ interface FreqDao extends Serializable {
     LiveData<List<Frequency>> getAll();
 
 
-    @Query("SELECT * FROM Frequency WHERE type LIKE :type1")
-    Frequency findByType(String type1);
+    @Query("SELECT * FROM Frequency WHERE type LIKE :type_name")
+    Frequency findByType(String type_name);
 
 
     @Query("DELETE FROM Frequency ")
     void deleteAll();
 
-    @Query("DELETE FROM Frequency WHERE type LIKE :type1")
-    void deleteMe(String type1);
+    @Query("DELETE FROM Frequency WHERE type LIKE :type_name")
+    void deleteMe(String type_name);
 
     @Insert
     void insertAll(Frequency... frequencies);
@@ -77,7 +79,7 @@ interface FreqDao extends Serializable {
     void delete(Frequency frequency);
 }
 
-// not relevant just instansiating the room db
+// instantiating the room db
 @Database(entities = {Frequency.class}, version = 1, exportSchema = false)
 abstract class AppDatabase extends RoomDatabase implements Serializable{
     public abstract FreqDao freqDao();

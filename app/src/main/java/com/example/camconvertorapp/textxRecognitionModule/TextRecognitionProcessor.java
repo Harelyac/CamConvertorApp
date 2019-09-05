@@ -16,6 +16,7 @@ package com.example.camconvertorapp.textxRecognitionModule;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.example.camconvertorapp.TheViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -39,18 +40,20 @@ import androidx.annotation.Nullable;
 public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVisionText> {
 
     private static final String TAG = "TextRecProc";
-    private static HashMap<String, HashSet> signs = new HashMap<String,HashSet>();// create hash map - key: unit type , value: set of all signs of that type
+    private static HashMap<String, String> CoversionTypeToSign = new HashMap<String,String>();// create hash map - key: unit type , value: set of all signs of that type
 
     // initialize those values from the view model
-    private float conversionRate = 1.0f;
-    private float source_price = 0.0f ;
-    private float target_price = 0.0f ;
-    private String sign = "";
+    private double conversionRate = 1.0f;
+    private double source_price = 0.0f ;
+    private double target_price = 0.0f ;
+    private String source_sign = "";
     private final FirebaseVisionTextRecognizer detector;
+    public TheViewModel viewModel;
 
     public TextRecognitionProcessor() {
 
         detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+        CoversionTypeToSign.put("Currency","$");
     }
 
     @Override
@@ -89,19 +92,24 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                     try {
                         source_price = Float.parseFloat(elements.get(k).getText());
                         if(k < elements.size() - 1){
-                            sign = elements.get(k+1).getText();
+                            source_sign = elements.get(k+1).getText();
+                        }
+                        // check the conversion type based on source sign
+
+                        // calculate the conversion rate based on source and target related to the conversion type
+                        if (source_sign.equals("$")){
+                            target_price = source_price * 3.33;
                         }
 
-                        // now check the conversion type based on sign using the hashtable (key = conversion type, value = all the sign representing unit types)
-                        // now identifiy target unit type using the getTatgetBySourceType(sign,conversion type)
-                        // now calculate the conversion rate
-                        target_price = source_price * conversionRate;
-                        GraphicOverlay.Graphic textGraphic = new TextGraphic(graphicOverlay,
-                                String.valueOf(target_price), elements.get(k).getBoundingBox());
-                        graphicOverlay.add(textGraphic);
+                        GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
+                                String.valueOf(target_price) + "NIS", elements.get(k).getBoundingBox());
+                        graphicOverlay.add(priceGraphic);
+
                     } catch (NumberFormatException ex) {
                         // Not a float
                     }
+                    // clear target price
+                    target_price = 0.0f;
                 }
             }
         }
