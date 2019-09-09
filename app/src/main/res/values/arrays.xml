@@ -6,12 +6,12 @@
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
 
         <item>Select an Item...</item>
-        <item>Dollar ($)</item>
+        <item>$</item> // only usd changed
         <item>Cent (&#162;)</item>
         <item>Pound (&#163;)</item>
         <item>Yen (&#165;)</item>
         <item>Rial (&#65020;)</item>
-        <item>Euro (&#8364;)</item>
+        <item>&#8364;</item> // only euro changed
         <item>NIS (&#8362;)</item>
         <item>lIRA (&#8356;)</item>
         <item>NIS (&#8362;)</item>

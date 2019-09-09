@@ -96,7 +96,7 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                             source_sign = elements.get(k+1).getText();
                         }
 
-                        /*if (source_sign != null && source_sign != null)
+                        if (source_sign != null && source_sign != null)
                         {
                             outer:
                             // check the conversion type based on source sign
@@ -106,15 +106,16 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                                 {
                                     if (sign.equals(source_sign))
                                     {
+                                        Log.d(TAG, "match!");
                                         conversion_type = key;
                                         break outer;
                                     }
                                 }
                             }
-                        }*/
+                        }
 
 
-                     /*   // check
+                        // check
                         target_sign = ViewModel.getTargetByFrequencyType(conversion_type);
 
                         if (target_sign != null)
@@ -125,20 +126,16 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                                 continue;
                             }
 
-                            conversionRate = Rate.getConversionRate(source_sign,target_sign);
-
+                            // fixme - check retrofit always fails
+                            //conversionRate = Rate.getConversionRate(source_sign,target_sign);
+                            conversionRate = 0.91; // manual
                             target_price = source_price * conversionRate;
 
                             // output the target price concatenated with the target sign
                             GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
                                     String.valueOf(target_price) + target_sign, elements.get(k).getBoundingBox());
                             graphicOverlay.add(priceGraphic);
-                        }*/
-
-                        // output the target price concatenated with the target sign
-                        GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
-                                String.valueOf(source_price) + source_sign, elements.get(k).getBoundingBox());
-                        graphicOverlay.add(priceGraphic);
+                        }
 
                     }
                     catch (NumberFormatException ex) {
@@ -146,6 +143,7 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                     }
                     // clear target price
                     target_price = 0.0f;
+                    target_sign = "";
                 }
             }
         }

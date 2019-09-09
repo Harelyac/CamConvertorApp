@@ -42,7 +42,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel
     {
         if (frequenciesMap.containsKey(FrequencyType))
         {
-            return frequenciesMap.get(FrequencyType).second;
+            return frequenciesMap.get(FrequencyType).first;
         }
         return null;
     }
@@ -106,13 +106,13 @@ public class ViewModel extends androidx.lifecycle.ViewModel
             if (!frequenciesMap.containsKey(type))
             {
                 if(type.equals("Currency"))
-                    frequenciesMap.put(type,new Pair<String, String>("Dollar $", "NIS"));
+                    frequenciesMap.put(type,new Pair<String, String>("$", "£"));
 
                 if(type.equals("Weight"))
                     frequenciesMap.put(type,new Pair<String, String>("update", "update"));
 
                 if(type.equals("Temperature"))
-                    frequenciesMap.put(type,new Pair<String, String>("degree kelvin", "degree Celsius &#8451;"));
+                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
 
 
                 //TODO didnt choose relevant types yet at these frequency's types-->

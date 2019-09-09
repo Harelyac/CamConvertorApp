@@ -85,7 +85,7 @@ public class cameraActivity extends AppCompatActivity
                     fixerRate.setText("Code: " + response.code());
                     return;
                 }
-
+                // if successful!
                 fixerResponse = response.body();
             }
 
