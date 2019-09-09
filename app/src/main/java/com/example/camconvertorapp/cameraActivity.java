@@ -87,13 +87,13 @@ public class cameraActivity extends AppCompatActivity
                 }
                 // if successful!
                 fixerResponse = response.body();
+                Toast.makeText(getApplicationContext(),"Succeededr to get response from server", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Error getting currency rates from Fixer.io", Toast.LENGTH_SHORT).show();
-                ((TextView) findViewById(R.id.entryText)).setText("Please enable network and restart the app:)");
-                ((TextView) findViewById(R.id.conversionRate)).setText("");
+                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Exception: "+Log.getStackTraceString(t));
             }
         });
 

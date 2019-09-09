@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
-
+        android:usesCleartextTraffic="true"
         android:hardwareAccelerated="false"
         android:largeHeap="true"
         android:allowBackup="true"
