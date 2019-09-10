@@ -69,7 +69,7 @@ public class cameraActivity extends AppCompatActivity
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
         viewModel.initHashMap();
 
-        fixerRate = (TextView) findViewById(R.id.conversionRate);
+        // fixerRate = (TextView) findViewById(R.id.conversionRate);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://data.fixer.io/")
@@ -97,8 +97,8 @@ public class cameraActivity extends AppCompatActivity
             }
         });
 
-        TextView frequenciesSelected = findViewById(R.id.baseCurrency);
-        frequenciesSelected.setText(getAllTypesOrdered(viewModel.getAllTypesStored()));
+        // TextView frequenciesSelected = findViewById(R.id.baseCurrency);
+        // frequenciesSelected.setText(getAllTypesOrdered(viewModel.getAllTypesStored()));
 
         //todo add here a buttom for moving the user to settings activity if he wants to change freqeuncies !!!
 
