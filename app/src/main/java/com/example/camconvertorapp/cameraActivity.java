@@ -14,6 +14,7 @@ import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
 import com.example.camconvertorapp.textxRecognitionModule.TextRecognitionProcessor;
 import java.io.IOException;
+import java.net.SocketOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,14 +40,15 @@ public class cameraActivity extends AppCompatActivity
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
 
-    private TextView fixerRate;
-    private Response fixerResponse;
+    TextView fixerRate;
+    Response fixerResponse;
 
     private String baseCurrency = "ILS";
     private String targetCurrency = "ILS";
     private float conversionRate = 1.0f;
 
     private TextRecognitionProcessor textRecognitionProcessor;
+
     private ViewModel viewModel;
 
     // MainActivity main OnCreate method.
@@ -85,9 +87,14 @@ public class cameraActivity extends AppCompatActivity
                     fixerRate.setText("Code: " + response.code());
                     return;
                 }
-                // if successful!
-                fixerResponse = response.body();
-                Toast.makeText(getApplicationContext(),"Succeededr to get response from server", Toast.LENGTH_SHORT).show();
+                    // if successful!
+                    fixerResponse = response.body();
+                    HashMap<String, Pair<String, String>> allTypes = viewModel.getAllTypesStored();
+                    baseCurrency = ViewModel.getSourceByFrequencyType("Currency");
+                    targetCurrency = ViewModel.getTargetByFrequencyType("Currency");
+                    conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
+                    textRecognitionProcessor.setConversionRate(conversionRate);
+                    Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -97,24 +104,6 @@ public class cameraActivity extends AppCompatActivity
             }
         });
 
-        // TextView frequenciesSelected = findViewById(R.id.baseCurrency);
-        // frequenciesSelected.setText(getAllTypesOrdered(viewModel.getAllTypesStored()));
-
-        //todo add here a buttom for moving the user to settings activity if he wants to change freqeuncies !!!
-
-
-
-        if (fixerResponse != null) {
-
-            HashMap<String, Pair<String, String>> allTypes = viewModel.getAllTypesStored();
-            String[] strs = (String[]) allTypes.keySet().toArray(new String[0]);
-
-            baseCurrency = allTypes.get("Currency").first;
-            targetCurrency = allTypes.get("Currency").second;
-            conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
-            textRecognitionProcessor.setConversionRate(conversionRate);
-            fixerRate.setText(String.valueOf(conversionRate));
-        }
 
 
 

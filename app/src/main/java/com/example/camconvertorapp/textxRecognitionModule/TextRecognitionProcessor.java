@@ -33,6 +33,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Processor for the text recognition demo.
@@ -42,19 +43,19 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
     private static final String TAG = "TextRecProc";
 
     // initialize those values from the view model
-    private double conversionRate = 1.0f;
+    private float conversionRate = 1.0f;
     private double source_price = 0.0f ;
     private double target_price = 0.0f ;
     private String source_sign = "";
     private String target_sign = "";
+    private String temp_sign = "";
     private String conversion_type = "";
     private final FirebaseVisionTextRecognizer detector;
 
 
-    public TextRecognitionProcessor() {
-
+    public TextRecognitionProcessor()
+    {
         detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-     //   CoversionTypeToSign.put("Currency","$");
     }
 
     @Override
@@ -96,7 +97,7 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                             source_sign = elements.get(k+1).getText();
                         }
 
-                        if (source_sign != null && source_sign != null)
+                        if ((source_sign != null))
                         {
                             outer:
                             // check the conversion type based on source sign
@@ -118,17 +119,18 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                         // check
                         target_sign = ViewModel.getTargetByFrequencyType(conversion_type);
 
+
                         if (target_sign != null)
                         {
+                            target_sign = target_sign.substring(target_sign.indexOf("(") + 1, target_sign.indexOf(")"));
+
+                            temp_sign = ViewModel.getSourceByFrequencyType(conversion_type);
                             // check if the source identified is not what actually being configured on room
-                            if (!source_sign.equals(ViewModel.getSourceByFrequencyType(conversion_type)))
+                            if (!source_sign.equals(temp_sign.substring(temp_sign.indexOf("(") + 1, temp_sign.indexOf(")"))))
                             {
                                 continue;
                             }
 
-                            // fixme - check retrofit always fails
-                            //conversionRate = Rate.getConversionRate(source_sign,target_sign);
-                            conversionRate = 0.91; // manual
                             target_price = source_price * conversionRate;
 
                             // output the target price concatenated with the target sign
@@ -136,7 +138,6 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                                     String.valueOf(target_price) + target_sign, elements.get(k).getBoundingBox());
                             graphicOverlay.add(priceGraphic);
                         }
-
                     }
                     catch (NumberFormatException ex) {
                         // Not a float

@@ -1,4 +1,5 @@
 package com.example.camconvertorapp;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -13,12 +14,18 @@ import com.igalata.bubblepicker.model.BubbleGradient;
 import com.igalata.bubblepicker.model.PickerItem;
 import com.igalata.bubblepicker.rendering.BubblePicker;
 
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import nl.dionsegijn.konfetti.KonfettiView;
 
 import android.transition.Slide;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
@@ -30,13 +37,34 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+    public ViewModel viewModel;
+    public AppDatabase db;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // start with initializing local App DB
+        db = AppDatabase.getDatabase(this);
+
+        // init view model
+        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+
+        // noticing the viewModel all the frequencies which have been already stored
+        db.freqDao().getAll().observe(this, new Observer<List<Frequency>>() {
+            @Override
+            public void onChanged(@Nullable final List<Frequency> frequencies) {
+
+                viewModel.setFrequenciesMap(frequencies);
+            }
+        });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -108,9 +136,132 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onBubbleSelected(@NotNull PickerItem item) {
 
-                if ( item.component1().equals("settings")){
+                if ( item.component1().equals("Settings")){
                     startActivity(new Intent(getApplicationContext(), settingsActivity.class));
                 }
+
+                if ( item.component1().equals("Default Types")){
+
+                    final HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
+
+
+                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                    final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
+                    boolean hasNotInit = viewModel.checkIfNotAllTypesSelected();
+                    if(ViewModel.frequenciesMap.isEmpty()){
+                        //the user is first time on App. send him to settings
+                        alertDialog.setTitle("hi, new user!");
+                        alertDialog.setMessage("tell us what types/signs you would like to convert");
+                        alertDialog.setPositiveButton("GO TO SETTINGS", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+//                                viewModel.setDefaultFreq();
+                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+
+                                dialog.cancel();
+                            }
+                        });
+
+                        alertDialog.setNegativeButton("use default types", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                viewModel.setDefaultFreq();
+                                dialog.cancel();
+                                alertDialog2.setTitle("Default Types");
+                                alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
+                                alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+//                                viewModel.setDefaultFreq();
+                                        startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+
+                                        dialog.cancel();
+                                    }
+                                });
+
+                                alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                AlertDialog alert1 = alertDialog2.create();
+
+                                alert1.show();
+                            }
+                        });
+
+                        AlertDialog alert = alertDialog.create();
+
+                        alert.show();
+                    }
+
+                    //otherwise - ask user whether to use his previous types
+                    else {
+                        alertDialog.setTitle("hi again!");
+                        alertDialog.setMessage("use conversion types from previous session?");
+                        alertDialog.setPositiveButton("YES, SHOW ME SELECTED TYPES", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
+                                alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
+                                alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+//                                viewModel.setDefaultFreq();
+                                        startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+
+                                        dialog.cancel();
+                                    }
+                                });
+
+                                alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                AlertDialog alert1 = alertDialog2.create();
+
+                                alert1.show();
+                            }
+                        });
+
+                        alertDialog.setNegativeButton("USE DIFFERENT TYPES", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog alert = alertDialog.create();
+
+                        alert.show();
+
+                    }
+
+
+
+
+                }
+                if ( item.component1().equals("Write Us")) {
+
+                }
+
+
 
             }
 

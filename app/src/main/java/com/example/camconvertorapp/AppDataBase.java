@@ -90,7 +90,6 @@ abstract class AppDatabase extends RoomDatabase implements Serializable{
             synchronized (AppDatabase.class){
                 if(INSTANCE == null){
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),AppDatabase.class,"camConvertor - database").build();
-
                 }
             }
         }

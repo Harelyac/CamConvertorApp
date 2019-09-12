@@ -1,15 +1,20 @@
 package com.example.camconvertorapp;
 import android.util.Pair;
 
+import com.example.camconvertorapp.currencyModule.Rate;
+import com.example.camconvertorapp.currencyModule.Response;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import kotlin.Triple;
 
 
 public class ViewModel extends androidx.lifecycle.ViewModel
 {
     // maybe we dont need it because now we have the "ConversionTypeToSigns" FIXME
-    String typesForConversionList[] = {"Currency", "Mass", "Temperature", "Length", "Volume" , "Pressure", "Time", "Angle" };
+    String typesForConversionList[] = {"Currency", "Weight", "Temperature", "Length", "Volume"};
     
     public static HashMap<String, ArrayList<String>> ConversionTypeToSigns = new HashMap<String,ArrayList<String>>();// create hash map - key: unit type , value: set of all signs of that type
 
@@ -24,6 +29,28 @@ public class ViewModel extends androidx.lifecycle.ViewModel
         ConversionTypeToSigns.get("Currency").add("€");
         ConversionTypeToSigns.get("Currency").add("£");
         ConversionTypeToSigns.get("Currency").add("¥");
+        ConversionTypeToSigns.get("Currency").add("₪");
+        ConversionTypeToSigns.get("Currency").add("\u20BD");
+
+
+        ConversionTypeToSigns.put("Weight", new ArrayList<String>());
+        ConversionTypeToSigns.get("Weight").add("kg");
+        ConversionTypeToSigns.get("Weight").add("lb"); // pound
+
+
+        ConversionTypeToSigns.put("Temperature", new ArrayList<String>());
+        ConversionTypeToSigns.get("Temperature").add("°C"); // part of the metric system
+        ConversionTypeToSigns.get("Temperature").add("°F"); // used in usa (but not actually in the imperial metric system)
+
+
+        ConversionTypeToSigns.put("Length", new ArrayList<String>());
+        ConversionTypeToSigns.get("Length").add("m");
+        ConversionTypeToSigns.get("Length").add("yd"); // yard
+
+
+        ConversionTypeToSigns.put("Volume", new ArrayList<String>());
+        ConversionTypeToSigns.get("Volume").add("L");
+        ConversionTypeToSigns.get("Volume").add("gal"); // pound
     }
 
 
@@ -90,11 +117,35 @@ public class ViewModel extends androidx.lifecycle.ViewModel
     }
 
 
-    //FIXME - delete unnecessary conversion types, and use default values based on location (ip - using retrofit)
-    /**in case the user forgot or started processing the camera without setting the desired
-     * source-target frequency's types - then set the default frequencies and notice him
-     * by pop-up alert message
-     */
+
+    // maybe for debug purposes
+    public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
+        Triple<String,String, String> str ;
+        ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
+        StringBuilder str2  = new StringBuilder();
+
+        String[] strs = (String[]) typesUpdated.keySet().toArray(new String[0]);
+        for(String type :  strs)
+        {
+            str2.append("\n").append("type: " + type + "\n")
+                    .append("     -> source sign: " + typesUpdated.get(type).first )
+                    .append("\n")
+                    .append("     -> target sign: " +typesUpdated.get(type).second)
+                    .append("\n");
+
+
+            str =  new Triple<String, String, String>(type , typesUpdated.get(type).first , typesUpdated.get(type).second);
+            list.add(str);
+
+
+        }
+        //return list;
+        return str2;
+    }
+
+    // set default conversion types source unit based on location - metric or imperial base unit types
+    // and currency of country / region only on conversion types that was not set yet
+
     public boolean setDefaultFreq(){
         boolean isTrue = false;
         for(String type: typesForConversionList)
@@ -114,28 +165,13 @@ public class ViewModel extends androidx.lifecycle.ViewModel
                 if(type.equals("Temperature"))
                     frequenciesMap.put(type,new Pair<String, String>("update", "update"));
 
-
-                //TODO didnt choose relevant types yet at these frequency's types-->
                 if(type.equals("Length"))
                     frequenciesMap.put(type,new Pair<String, String>("update", "update"));
 
                 if(type.equals("volume"))
                     frequenciesMap.put(type,new Pair<String, String>("update", "update"));
 
-                if(type.equals("pressure"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
-
-                if(type.equals("time"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
-
-                if(type.equals("speed"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
-
-                if(type.equals("angle"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
-
                 isTrue = true;
-
             }
         }
         return isTrue;

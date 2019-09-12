@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    // spinners values ~
 
     <string-array name="currencies">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-
         <item>Select an Item...</item>
-        <item>$</item> // only usd changed
+        <item>Dollar ($)</item> // only usd changed
         <item>Cent (&#162;)</item>
         <item>Pound (&#163;)</item>
         <item>Yen (&#165;)</item>
         <item>Rial (&#65020;)</item>
-        <item>&#8364;</item> // only euro changed
+        <item>Euro (&#8364;)</item> // only euro changed
         <item>NIS (&#8362;)</item>
-        <item>lIRA (&#8356;)</item>
-        <item>NIS (&#8362;)</item>
+        <item>RUB (₽)</item>
         <item>NIS (&#8362;)</item>
     </string-array>
 
@@ -27,14 +25,12 @@
         <item>degree Rankine </item>
         <item>degree Reaumur </item>
         <item>degree kelvin (&#8490;)</item>
-
     </string-array>
 
 
     <string-array name="length">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-
         <item>kilometer (km)</item>
         <item>meter (m)</item>
         <item>decimeter (dm)</item>
@@ -46,20 +42,17 @@
         <item>Yard (yd)</item>
         <item>Foot (ft)</item>
         <item>Inch (in)</item>
-
     </string-array>
 
 
     <string-array name="weights">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-
+        <item>kilogram (kg)</item>
         <item>update</item>
         <item>update</item>
         <item>update</item>
         <item>update</item>
-        <item>update</item>
-
     </string-array>
 
 
@@ -72,70 +65,23 @@
         <item>update</item>
         <item>update</item>
         <item>update</item>
-
-    </string-array>
-    <string-array name="pressure">
-        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
-
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-
     </string-array>
 
-    <string-array name="time">
-        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
-
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-
-    </string-array>
-
-    <string-array name="speed">
-        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
-
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-
-    </string-array>
-
-    <string-array name="angle">
-        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
-
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
-
-    </string-array>
     <string-array name="title">
 
-        <item>help</item>
+        <item>Help</item>
 
-        <item>about us</item>
+        <item>About Us</item>
 
-        <item>settings</item>
+        <item>Settings</item>
 
-        <item>defaults types</item>
+        <item>Default Types</item>
 
-        <item>supported types</item>
+        <item>Null</item>
 
-        <item>sync currencies</item>
+        <item>Sync Types</item>
 
-        <item>write us</item>
+        <item>Write Us!</item>
 
 
     </string-array>

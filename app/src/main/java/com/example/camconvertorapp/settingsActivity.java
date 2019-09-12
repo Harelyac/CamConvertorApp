@@ -1,6 +1,7 @@
 package com.example.camconvertorapp;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -44,8 +45,8 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     private Spinner mTarget2;
     private YoYo.YoYoString rope;
 
-    int flags[] = {R.drawable.weight_icon, R.drawable.currency_icon, R.drawable.temperature_icon, R.drawable.length_icon, R.drawable.volume_icon, R.drawable.pressure_icon,R.drawable.time_icon,R.drawable.speed,R.drawable.angle_icon};
-    String typesForConversionList[] = {"Weight", "Currency", "Temperature", "Length", "volume" , "pressure", "time", "speed", "angle" };
+    int flags[] = {R.drawable.currency_icon, R.drawable.weight_icon, R.drawable.temperature_icon, R.drawable.length_icon, R.drawable.volume_icon};
+    String typesForConversionList[] = {"Currency", "Weight" , "Temperature", "Length", "Volume" };
     public AppDatabase db;
     public ViewModel viewModel;
     private RecyclerView.LayoutManager layoutManager;
@@ -61,30 +62,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         textView = findViewById(R.id.textView);
         textView2 = findViewById(R.id.textView2);
 
-        // if its the first time the user come in - help pop up
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
-        alertDialog.setTitle("Hi! Here we Go!");
-        alertDialog.setMessage("select conversion types from the list\nthen choose the source and target sign");
-        alertDialog.setPositiveButton("Got It", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        alertDialog.setNegativeButton("Help", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // TODO send the user to Help Activity for further explanations and use cases
-                dialog.cancel();
-            }
-        });
-        AlertDialog alert = alertDialog.create();
-        alert.show();
-
-
         // start with initializing local App DB
         db = AppDatabase.getDatabase(this);
 
@@ -99,6 +76,62 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 viewModel.setFrequenciesMap(frequencies);
             }
         });
+
+        // if its the first time the user come in - help pop up
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
+        final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(settingsActivity.this);
+        alertDialog.setTitle("Hi! Here we Go!");
+        alertDialog.setMessage("select conversion types from the list\nthen choose the source and target sign");
+        alertDialog.setPositiveButton("Got It", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        if(!ViewModel.frequenciesMap.isEmpty()) {
+
+
+            final HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
+
+            alertDialog.setNegativeButton("Show types from previous session", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // TODO send the user to Help Activity for further explanations and use cases
+                    dialog.cancel();
+                    alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
+                    alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
+                    alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+//                                viewModel.setDefaultFreq();
+
+
+                            dialog.cancel();
+                        }
+                    });
+
+                    alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    AlertDialog alert1 = alertDialog2.create();
+
+                    alert1.show();
+                }
+            });
+        }
+        AlertDialog alert = alertDialog.create();
+        alert.show();
+
+
+
 
         mListView = (RecyclerView) findViewById(R.id.list_items);
 
@@ -132,9 +165,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
                 HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
 
-                Snackbar.make(v, "Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
+                //debug purposes
                Toast.makeText(settingsActivity.this,"Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
                         Toast.LENGTH_LONG).show();
 
@@ -204,101 +235,112 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
 
     // create a frequency with the given input from user and then put it into the room db.
-    public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency){
+    public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency) {
         int array = 0;
 
-        if(type.equals("Currency"))
-        {
+        if (type.equals("Currency")) {
             array = R.array.currencies;
             newFrequency.type = "Currency";
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget.setAdapter(adapter);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget2.setAdapter(adapter2);
+            if (ViewModel.frequenciesMap.containsKey("Currency")) {
+                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Currency"));
+                mTarget.setSelection(spinnerPosition);
+
+                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Currency"));
+                mTarget2.setSelection(spinnerPosition2);
+            }
 
         }
 
-        if(type.equals("Weight")){
+        if (type.equals("Weight")) {
             array = R.array.weights;
             newFrequency.type = "Weight";
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            mTarget.setAdapter(adapter);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget2.setAdapter(adapter2);
+            if (ViewModel.frequenciesMap.containsKey("Weight")) {
+                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Weight"));
+                mTarget.setSelection(spinnerPosition);
+
+                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Weight"));
+                mTarget2.setSelection(spinnerPosition2);
+            }
 
         }
-        if(type.equals("Temperature")){
+        if (type.equals("Temperature")) {
             array = R.array.temperature;
             newFrequency.type = "Temperature";
 
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            mTarget.setAdapter(adapter);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget2.setAdapter(adapter2);
+            if (ViewModel.frequenciesMap.containsKey("Temperature")) {
+                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Temperature"));
+                mTarget.setSelection(spinnerPosition);
+
+                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Temperature"));
+                mTarget2.setSelection(spinnerPosition2);
+            }
+
         }
-        if(type.equals("Length")){
+        if (type.equals("Length")) {
             array = R.array.length;
             newFrequency.type = "Length";
 
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            mTarget.setAdapter(adapter);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget2.setAdapter(adapter2);
+            if (ViewModel.frequenciesMap.containsKey("Length")) {
+                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Length"));
+                mTarget.setSelection(spinnerPosition);
+
+                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Length"));
+                mTarget2.setSelection(spinnerPosition2);
+            }
+
 
         }
-        if(type.equals("volume")){
+        if (type.equals("Volume")) {
             array = R.array.volume;
-            newFrequency.type = "volume";
+            newFrequency.type = "Volume";
+
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            mTarget.setAdapter(adapter);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTarget2.setAdapter(adapter2);
+            if (ViewModel.frequenciesMap.containsKey("Volume")) {
+                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Volume"));
+                mTarget.setSelection(spinnerPosition);
+
+                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Volume"));
+                mTarget2.setSelection(spinnerPosition2);
+            }
 
         }
-        if(type.equals("pressure")){
-            array = R.array.pressure;
-            newFrequency.type = "pressure";
 
-        }
-        if(type.equals("time")){
-            array = R.array.time;
-            newFrequency.type = "time";
-        }
-
-        if(type.equals("speed")){
-            array = R.array.speed;
-            newFrequency.type = "speed";
-        }
-        if(type.equals("angle")){
-            array = R.array.angle;
-            newFrequency.type = "angle";
-
-        }
 
         //select source currency and save on room
         textView1.setText("choose the source " + type + " type:" );//TODO maybe change instruction
-
-        ArrayAdapter<CharSequence> adapter =  ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
-
-//        ArrayAdapter adapter1 = new ArrayAdapter(this,android.R.layout.simple_spinner_item,array){
-//            @Override
-//            public boolean isEnabled(int position){
-//                if(position == 0)
-//                {
-//                    // Disable the first item from Spinner
-//                    // First item will be use for hint
-//                    return false;
-//                }
-//                else
-//                {
-//                    return true;
-//                }
-//            }
-//            @Override
-//            public View getDropDownView(int position, View convertView,
-//                                        ViewGroup parent) {
-//                View view = super.getDropDownView(position, convertView, parent);
-//                TextView tv = (TextView) view;
-//                if(position == 0){
-//                    // Set the hint text color gray
-//                    tv.setTextColor(Color.GRAY);
-//                }
-//                else {
-//                    tv.setTextColor(Color.BLACK);
-//                }
-//                return view;
-//            }
-//        };
-//
-//        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//
-//        mTarget.setAdapter(adapter1);
-//
-
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mTarget.setAdapter(adapter);
 
 
 
@@ -306,10 +348,8 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         if (rope != null) {
             rope.stop(true);
         }
-//        if (rope != null) {
-//            rope.stop(true);
-//        }
 
+        //now choosing the signs from Spinners
         mTarget.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
@@ -326,6 +366,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                     Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
                     //save in ROOM sqlite as default currency TODO
                     newFrequency.source = currency_selected_source;
+                    insertToLocalDB(newFrequency);
                 }
             }
 
@@ -341,48 +382,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         textView2.setText("choose the target " + type + " type:");//TODO maybe change instruction
 
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(),array, android.R.layout.simple_spinner_item);
-
-
-//        ArrayAdapter<CharSequence> adapter2 = new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,array){
-//            @Override
-//            public boolean isEnabled(int position){
-//                if(position == 0)
-//                {
-//                    // Disable the first item from Spinner
-//                    // First item will be use for hint
-//                    return false;
-//                }
-//                else
-//                {
-//                    return true;
-//                }
-//            }
-//            @Override
-//            public View getDropDownView(int position, View convertView,
-//                                        ViewGroup parent) {
-//                View view = super.getDropDownView(position, convertView, parent);
-//                TextView tv = (TextView) view;
-//                if(position == 0){
-//                    // Set the hint text color gray
-//                    tv.setTextColor(Color.GRAY);
-//                }
-//                else {
-//                    tv.setTextColor(Color.BLACK);
-//                }
-//                return view;
-//            }
-//        };
-//
-//        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//
-//        mTarget2.setAdapter(adapter2);
-
-
-
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mTarget2.setAdapter(adapter2);
 
         mTarget2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -406,12 +405,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
-
             }
 
         });
-
-
 
     }
 
@@ -421,15 +417,10 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         new insertLocalAsyncTask(db.freqDao()).execute(newFrequency);
     }
 
-//    void deleteByType(String type){
-//        new deleteALLAsyncTask(db.freqDao()).execute(type);
-//    }
-
+    //debug purposes
     void deleteAll(){
         new deleteALLAsyncTask(db.freqDao()).execute();
     }
-
-
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -507,31 +498,12 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             setTypesSelected("Length", textView, textView2, newFrequency );
 
         }
-        if(typesForConversionList[(int) id].equals("volume")) {
+        if(typesForConversionList[(int) id].equals("Volume")) {
 
-            setTypesSelected("volume", textView, textView2, newFrequency );
-
-        }
-        if(typesForConversionList[(int) id].equals("pressure")) {
-
-            setTypesSelected("pressure", textView, textView2, newFrequency );
+            setTypesSelected("Volume", textView, textView2, newFrequency );
 
         }
-        if(typesForConversionList[(int) id].equals("time")) {
 
-            setTypesSelected("time", textView, textView2, newFrequency );
-
-        }
-        if(typesForConversionList[(int) id].equals("speed")) {
-
-            setTypesSelected("speed", textView, textView2, newFrequency );
-
-        }
-        if(typesForConversionList[(int) id].equals("angle")) {
-
-            setTypesSelected("angle", textView, textView2, newFrequency );
-
-        }
     }
 
     // debug purposes - check current types stored on room db

@@ -4,25 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Rate {
-    public static float ILS;
-    public static float EUR;
-    public static float USD;
-    public static float AUD;
-    public static float CAD;
-    public static float GBP;
-    public static float JPY;
-    public static float RUB;
+    public  float ILS;
+    public  float EUR;
+    public  float USD;
+    public  float AUD; // not in use, just for fetching response
+    public  float CAD; // not in use, just for fetching response
+    public  float GBP;
+    public  float JPY;
+    public  float RUB;
 
-    public static float getConversionRate(String baseRateName, String targetRateName) {
-        Map<String,Float> rates = new HashMap<String,Float>();
-        rates.put("ILS",ILS);
-        rates.put("€",EUR);
-        rates.put("$",USD);
+    public float getConversionRate(String baseRateName, String targetRateName) {
+        Map<String, Float> rates = new HashMap<String, Float>();
+        rates.put("NIS (₪)",ILS);
+        rates.put("Euro (€)",EUR);
+        rates.put("Dollar ($)",USD);
         rates.put("AUD",AUD); // sign same as dollar, we wont use it
         rates.put("CAD",CAD); // sign same as dollar, we wont use it
-        rates.put("£",GBP);
-        rates.put("¥",JPY); // yen, japan
-        rates.put("RUB",RUB); // rubel, russia
+        rates.put("Pound (£)",GBP);
+        rates.put("Yen (¥)",JPY); // yen, japan
+        rates.put("RUB (\u20BD)",RUB); // rubel, russia
 
         Float baseRate = rates.get(baseRateName);
         Float targetRate = rates.get(targetRateName);
