@@ -14,7 +14,6 @@ import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
 import com.example.camconvertorapp.textxRecognitionModule.TextRecognitionProcessor;
 import java.io.IOException;
-import java.net.SocketOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

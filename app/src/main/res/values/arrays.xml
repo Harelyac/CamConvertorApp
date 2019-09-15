@@ -13,15 +13,13 @@
         <item>Euro (&#8364;)</item> // only euro changed
         <item>NIS (&#8362;)</item>
         <item>RUB (₽)</item>
-        <item>NIS (&#8362;)</item>
     </string-array>
-
+    NIS (&#8362;
     <string-array name="temperature">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-
-        <item>degree Celsius (&#8451;)</item>
-        <item>degree Fahrenheit (&#8457;)</item>
+        <item>degree Celsius (°C)</item>
+        <item>degree Fahrenheit (°F)</item>
         <item>degree Rankine </item>
         <item>degree Reaumur </item>
         <item>degree kelvin (&#8490;)</item>
@@ -49,7 +47,7 @@
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
         <item>kilogram (kg)</item>
-        <item>update</item>
+        <item>pound (lb)</item>
         <item>update</item>
         <item>update</item>
         <item>update</item>
@@ -59,9 +57,8 @@
     <string-array name="volume">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-
-        <item>update</item>
-        <item>update</item>
+        <item>Liter (L)</item>
+        <item>gallon (gal)</item>
         <item>update</item>
         <item>update</item>
         <item>update</item>

@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 
-
+import com.example.camconvertorapp.locationModule.IpApi;
+import com.example.camconvertorapp.locationModule.Response;
 import com.daimajia.androidanimations.library.Techniques;
 import com.eftimoff.androipathview.PathView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.igalata.bubblepicker.BubblePickerListener;
 import com.igalata.bubblepicker.adapter.BubblePickerAdapter;
@@ -23,8 +25,13 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import nl.dionsegijn.konfetti.KonfettiView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.transition.Slide;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
@@ -34,6 +41,7 @@ import com.daimajia.androidanimations.library.YoYo;
 
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +51,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     public ViewModel viewModel;
     public AppDatabase db;
-
+    public Response IpResponse;
 
 
     @Override
@@ -57,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         // init view model
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
 
-        // noticing the viewModel all the frequencies which have been already stored
+        // observe into live data and update view model with it
         db.freqDao().getAll().observe(this, new Observer<List<Frequency>>() {
             @Override
             public void onChanged(@Nullable final List<Frequency> frequencies) {
@@ -65,6 +73,39 @@ public class MainActivity extends AppCompatActivity {
                 viewModel.setFrequenciesMap(frequencies);
             }
         });
+
+
+        // FIXME - need to find a an api to get location
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://ipinfo.io/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        IpApi ipApi = retrofit.create(IpApi.class);
+        Call<Response> call = ipApi.getResponse();
+        call.enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("", "onResponse: " + response.toString());
+                    return;
+                }
+                // if successful!
+                IpResponse = response.body();
+                viewModel.setDefaultFreq(IpResponse.timezone, IpResponse.country);
+                Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Response> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
+                Log.e("", "Exception: "+Log.getStackTraceString(t));
+            }
+        });
+
+
+
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -168,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                viewModel.setDefaultFreq();
                                 dialog.cancel();
                                 alertDialog2.setTitle("Default Types");
                                 alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());

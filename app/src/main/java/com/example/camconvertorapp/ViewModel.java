@@ -1,9 +1,5 @@
 package com.example.camconvertorapp;
 import android.util.Pair;
-
-import com.example.camconvertorapp.currencyModule.Rate;
-import com.example.camconvertorapp.currencyModule.Response;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,34 +142,106 @@ public class ViewModel extends androidx.lifecycle.ViewModel
     // set default conversion types source unit based on location - metric or imperial base unit types
     // and currency of country / region only on conversion types that was not set yet
 
-    public boolean setDefaultFreq(){
-        boolean isTrue = false;
+    public void setDefaultFreq(String timezone, String country){
+        String [] parts = timezone.split("/",0);
+
+        boolean isMetric = true;
+
+        String value = country;
+
+        // only in Europe get continent
+        if (parts[0].equals("Europe"))
+        {
+            value = parts[0];
+        }
+
+        if (country.equals("GB"))
+        {
+            value = country;
+        }
+
+        if (value.equals("US"))
+        {
+            isMetric = false;
+        }
+
         for(String type: typesForConversionList)
         {
             if(frequenciesMap == null)
             {
-                return true;
+                return;
             }
             if (!frequenciesMap.containsKey(type))
             {
-                if(type.equals("Currency"))
-                    frequenciesMap.put(type,new Pair<String, String>("$", "£"));
+                if (isMetric)
+                {
+                    if(type.equals("Currency"))
+                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "update"));
 
-                if(type.equals("Weight"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
+                    if(type.equals("Weight"))
+                        frequenciesMap.put(type,new Pair<String, String>("kilogram (kg)", "update"));
 
-                if(type.equals("Temperature"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
+                    if(type.equals("Temperature"))
+                        frequenciesMap.put(type,new Pair<String, String>("degree Celsius (°C)", "update"));
 
-                if(type.equals("Length"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
+                    if(type.equals("Length"))
+                        frequenciesMap.put(type,new Pair<String, String>("meter (m)", "update"));
 
-                if(type.equals("volume"))
-                    frequenciesMap.put(type,new Pair<String, String>("update", "update"));
+                    if(type.equals("Volume"))
+                        frequenciesMap.put(type,new Pair<String, String>("Liter (L)", "update"));
+                }
+                else
+                {
+                    if(type.equals("Currency"))
+                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "update"));
 
-                isTrue = true;
+                    if(type.equals("Weight"))
+                        frequenciesMap.put(type,new Pair<String, String>("pound (lb)", "update"));
+
+                    if(type.equals("Temperature"))
+                        frequenciesMap.put(type,new Pair<String, String>("degree Fahrenheit (°F)", "update"));
+
+                    if(type.equals("Length"))
+                        frequenciesMap.put(type,new Pair<String, String>("Yard (yd)", "update"));
+
+                    if(type.equals("Volume"))
+                        frequenciesMap.put(type,new Pair<String, String>("gallon (gal)", "update"));
+                }
             }
         }
-        return isTrue;
+    }
+
+    // get currency by given country name
+    public String getCurrency(String country)
+    {
+        switch(country)
+        {
+            case "IL":
+            {
+                return "NIS (₪)";
+            }
+            case "US":
+            {
+                return "Dollar ($)";
+            }
+            case "EU":
+            {
+                return "Euro (€)";
+            }
+            case "GB":
+            {
+                return "Pound (£)";
+            }
+            case "JP":
+            {
+                return "Yen (¥)";
+            }
+            case "RU":
+            {
+                return "RUB (\u20BD)";
+            }
+            default:
+                return "";
+        }
     }
 }

@@ -18,7 +18,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -29,8 +32,10 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import com.google.android.gms.common.data.DataBuffer;
 import com.google.android.gms.common.images.Size;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.nio.ByteBuffer;
@@ -303,16 +308,16 @@ public class CameraSource {
     }
     parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
     parameters.setPreviewFpsRange(
-        previewFpsRange[Camera.Parameters.PREVIEW_FPS_MIN_INDEX],
-        previewFpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX]);
+            previewFpsRange[Camera.Parameters.PREVIEW_FPS_MIN_INDEX],
+            previewFpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX]);
     parameters.setPreviewFormat(ImageFormat.NV21);
 
     setRotation(camera, parameters, requestedCameraId);
 
     if (requestedAutoFocus) {
       if (parameters
-          .getSupportedFocusModes()
-          .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+              .getSupportedFocusModes()
+              .contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
       } else {
         Log.i(TAG, "Camera auto focus is not supported on this device.");
@@ -383,7 +388,7 @@ public class CameraSource {
     for (SizePair sizePair : validPreviewSizes) {
       Size size = sizePair.previewSize();
       int diff =
-          Math.abs(size.getWidth() - desiredWidth) + Math.abs(size.getHeight() - desiredHeight);
+              Math.abs(size.getWidth() - desiredWidth) + Math.abs(size.getHeight() - desiredHeight);
       if (diff < minDiff) {
         selectedPair = sizePair;
         minDiff = diff;
@@ -404,8 +409,8 @@ public class CameraSource {
     private Size picture;
 
     SizePair(
-        Camera.Size previewSize,
-        @Nullable Camera.Size pictureSize) {
+            Camera.Size previewSize,
+            @Nullable Camera.Size pictureSize) {
       preview = new Size(previewSize.width, previewSize.height);
       if (pictureSize != null) {
         picture = new Size(pictureSize.width, pictureSize.height);
@@ -434,9 +439,9 @@ public class CameraSource {
   private static List<SizePair> generateValidPreviewSizeList(Camera camera) {
     Camera.Parameters parameters = camera.getParameters();
     List<Camera.Size> supportedPreviewSizes =
-        parameters.getSupportedPreviewSizes();
+            parameters.getSupportedPreviewSizes();
     List<Camera.Size> supportedPictureSizes =
-        parameters.getSupportedPictureSizes();
+            parameters.getSupportedPictureSizes();
     List<SizePair> validPreviewSizes = new ArrayList<>();
     for (Camera.Size previewSize : supportedPreviewSizes) {
       float previewAspectRatio = (float) previewSize.width / (float) previewSize.height;
@@ -647,13 +652,44 @@ public class CameraSource {
 
         if (!bytesToByteBuffer.containsKey(data)) {
           Log.d(
-              TAG,
-              "Skipping frame. Could not find ByteBuffer associated with the image "
-                  + "data from the camera.");
+                  TAG,
+                  "Skipping frame. Could not find ByteBuffer associated with the image "
+                          + "data from the camera.");
           return;
         }
 
+
         pendingFrameData = bytesToByteBuffer.get(data);
+
+
+        //try to convert byteBuffer into bitmap image and then into jpg - to test the auto ML model with #todo
+
+
+
+
+//        // Retrieve bytes between the position and limit
+//// (see Putting Bytes into a ByteBuffer)
+//        data = new byte[pendingFrameData.remaining()];
+//
+//// transfer bytes from this buffer into the given destination array
+//        pendingFrameData.get(data, 0, data.length);
+//
+//// Retrieve all bytes in the buffer
+//        pendingFrameData.clear();
+//        data = new byte[pendingFrameData.capacity()];
+//
+//// transfer bytes from this buffer into the given destination array
+//        pendingFrameData.get(data, 0, bytes.length);
+//
+//        final Bitmap bmp= BitmapFactory.decodeByteArray(data,0,data.length);
+//        //Create a file for the output
+//        File output = new File("c:/temp/image.jpg");
+//
+////Write the image to the destination as a JPG
+//        ImageIO.write(bmp, "jpg", output);
+//
+//
+
 
         // Notify the processor thread if it is waiting on the next frame (see below).
         lock.notifyAll();
@@ -715,14 +751,14 @@ public class CameraSource {
           synchronized (processorLock) {
             Log.d(TAG, "Process an image");
             frameProcessor.process(
-                data,
-                new FrameMetadata.Builder()
-                    .setWidth(previewSize.getWidth())
-                    .setHeight(previewSize.getHeight())
-                    .setRotation(rotation)
-                    .setCameraFacing(facing)
-                    .build(),
-                graphicOverlay);
+                    data,
+                    new FrameMetadata.Builder()
+                            .setWidth(previewSize.getWidth())
+                            .setHeight(previewSize.getHeight())
+                            .setRotation(rotation)
+                            .setCameraFacing(facing)
+                            .build(),
+                    graphicOverlay);
           }
         } catch (Throwable t) {
           Log.e(TAG, "Exception thrown from receiver.", t);

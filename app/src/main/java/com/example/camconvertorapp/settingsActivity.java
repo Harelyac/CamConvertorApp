@@ -131,8 +131,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         alert.show();
 
 
-
-
         mListView = (RecyclerView) findViewById(R.id.list_items);
 
 
@@ -166,7 +164,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
 
                 //debug purposes
-               Toast.makeText(settingsActivity.this,"Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
+                Toast.makeText(settingsActivity.this,"Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
                         Toast.LENGTH_LONG).show();
 
                 // now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
@@ -184,7 +182,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            viewModel.setDefaultFreq();
+                            // viewModel.setDefaultFreq();
                             dialog.cancel();
                         }
                     });
@@ -260,6 +258,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         if (type.equals("Weight")) {
             array = R.array.weights;
             newFrequency.type = "Weight";
+
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -366,6 +365,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                     Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
                     //save in ROOM sqlite as default currency TODO
                     newFrequency.source = currency_selected_source;
+
+                    getTableAsString(db,"Frequency");
+
                     insertToLocalDB(newFrequency);
                 }
             }
@@ -449,7 +451,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
         if (id == R.id.action_settings) {
 
-           // startActivity(new Intent(this, editActivity.class));
+            // startActivity(new Intent(this, editActivity.class));
 
             return true;
         }
