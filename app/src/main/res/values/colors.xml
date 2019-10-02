@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="touch_effect">#9ccc</color>
+    <color name="colorPrimary">#327E74</color>
+    <color name="colorPrimaryDark">#30689F</color>
+    <color name="colorAccent">#E4135F</color>
+    <color name="touch_effect">#99DF0707</color>
 
     <color name="material_animations_primary">#039BE5</color>
     <color name="material_animations_primary_dark">#0277BD</color>

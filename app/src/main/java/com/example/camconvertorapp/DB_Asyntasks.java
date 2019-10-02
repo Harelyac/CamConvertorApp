@@ -1,8 +1,6 @@
 package com.example.camconvertorapp;
-
 import android.os.AsyncTask;
 
-import javax.xml.transform.Source;
 
 /**this class consists of asyntask classes manage insertion and deletion of the
  * newFrequency object typed by the user - into the local Room App data base**/
@@ -17,7 +15,7 @@ class insertLocalAsyncTask extends AsyncTask<Frequency,Void,Void> {
 
     }
 
-    // this part is because hazan didn't knw that update query existed in sql
+    // this part is because the full stack junior didn't know that update query existed in sql
     @Override
     protected Void doInBackground(Frequency... frequencies) {
         Frequency frequency = mAsyntaskDao.findByType(frequencies[0].type);
@@ -65,8 +63,5 @@ class deleteALLAsyncTask extends AsyncTask<Frequency,Void,Void>{
 }
 
 
-//TODO add more asyntasks for converting on background a specific source type which has been -
-//TODO recognized by Camera - according to the stored target type which corresponds to the relevant type
 
-//use FreqDao.getAll() for saving the frequencies chosen by the user at global place in project
-//if some frequency's types were not set by the user (maybe all of them) - use DEFAULT types
+

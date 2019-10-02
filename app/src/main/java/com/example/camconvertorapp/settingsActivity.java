@@ -1,29 +1,26 @@
 package com.example.camconvertorapp;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
-
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.camconvertorapp.locationModule.IpApi;
+import com.example.camconvertorapp.locationModule.Response;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +31,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import kotlin.Triple;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static java.lang.Thread.sleep;
 
 public class settingsActivity extends FragmentActivity implements EffectAdapter.AdapterClickCallback {
 
@@ -46,13 +49,13 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     private YoYo.YoYoString rope;
 
     int flags[] = {R.drawable.currency_icon, R.drawable.weight_icon, R.drawable.temperature_icon, R.drawable.length_icon, R.drawable.volume_icon};
-    String typesForConversionList[] = {"Currency", "Weight" , "Temperature", "Length", "Volume" };
-    public AppDatabase db;
+    String typesForConversionList[] = {"Currency", "Weight" , "Length", "Volume" };
+    public  AppDatabase db;
     public ViewModel viewModel;
     private RecyclerView.LayoutManager layoutManager;
     TextView textView ;
     TextView textView2 ;
-
+    public Response IpResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
         final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(settingsActivity.this);
         alertDialog.setTitle("Hi! Here we Go!");
-        alertDialog.setMessage("select conversion types from the list\nthen choose the source and target sign");
+        alertDialog.setMessage("Select conversion types from the list\nthen choose the source and target sign");
         alertDialog.setPositiveButton("Got It", new DialogInterface.OnClickListener() {
 
             @Override
@@ -89,8 +92,10 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 dialog.cancel();
             }
         });
-        if(!ViewModel.frequenciesMap.isEmpty()) {
 
+
+
+        if(!ViewModel.frequenciesMap.isEmpty()) {
 
             final HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
 
@@ -98,7 +103,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // TODO send the user to Help Activity for further explanations and use cases
                     dialog.cancel();
                     alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
                     alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
@@ -106,15 +110,11 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
-//                                viewModel.setDefaultFreq();
-
-
                             dialog.cancel();
                         }
                     });
 
-                    alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -127,16 +127,27 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 }
             });
         }
+
         AlertDialog alert = alertDialog.create();
         alert.show();
 
-
         mListView = (RecyclerView) findViewById(R.id.list_items);
-
 
         // use spinners for choosing signs
         mTarget = (Spinner) findViewById(R.id.spinner1);
         mTarget2 = (Spinner) findViewById(R.id.spinner2);
+
+        // set default values on spinners
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.currencies, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), R.array.currencies, android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTarget.setAdapter(adapter);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTarget2.setAdapter(adapter2);
+
+        mTarget.setSelection(0);
+        mTarget2.setSelection(0);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -152,32 +163,53 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         mListView.setAdapter(customAdapter);
         customAdapter.callback = this;
 
+
+        // restful api for getting current location of phone for default types initialization
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://ipinfo.io/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        IpApi ipApi = retrofit.create(IpApi.class);
+        Call<Response> call = ipApi.getResponse();
+        call.enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("", "onResponse: " + response.toString());
+                    return;
+                }
+                // if successful!
+                IpResponse = response.body();
+                setDefaultFreq(IpResponse.timezone, IpResponse.country);
+                Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Response> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
+                Log.e("", "Exception: "+Log.getStackTraceString(t));
+            }
+        });
+
+
+
         // when submit is clicked
         Button but = findViewById(R.id.btnSubmit);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // debug -->
-                getTableAsString(db,"Frequency");
-
-                HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
-
-                //debug purposes
-                Toast.makeText(settingsActivity.this,"Types currently selected: \n " + getAllTypesOrdered(typesUpdated).toString(),
-                        Toast.LENGTH_LONG).show();
-
-                // now look for all frequencies which have not been initialized explicitly and set for them DEFAULT values:
-
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(settingsActivity.this);
 
+                // check if room db has not be initialized
                 boolean hasNotInit = viewModel.checkIfNotAllTypesSelected();
-                if(!hasNotInit && !ViewModel.frequenciesMap.isEmpty())
+
+                if(hasNotInit)
                 {
                     //the user didnt define all types conversions - notice him:
-                    alertDialog.setTitle("popup message");
+                    alertDialog.setTitle("Hi mate!");
                     alertDialog.setMessage("you did not set all conversion types");
-                    alertDialog.setPositiveButton("USE DEFAULT TYPES", new DialogInterface.OnClickListener() {
+                    alertDialog.setPositiveButton("ALRIGHT", new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -187,52 +219,167 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                         }
                     });
 
-                    alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
 
                     AlertDialog alert = alertDialog.create();
-
                     alert.show();
+                }
+                else
+                {
+                    Toast toast = new Toast(getApplicationContext());
+                    TextView tv = new TextView(settingsActivity.this);
+                    //tv.setBackgroundColor(Color.BLUE);
+                    tv.setTextColor(Color.WHITE);
+                    tv.setTextSize(25);
+                    Typeface typeface = Typeface.create("serif", Typeface.BOLD);
+                    tv.setTypeface(typeface);
+                    tv.setPadding(10,10,10,10);
+                    tv.setText("Added Successfully!");
+                    toast.setView(tv);
+                    toast.show();
+
                 }
             }
         });
-
-
     }
 
 
-    // maybe for debug purposes
-    public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
-        Triple<String,String, String> str ;
-        ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
-        StringBuilder str2  = new StringBuilder();
+    // set default conversion types source unit based on location - metric or imperial base unit types
+    // and currency of country / region only on conversion types that was not set yet
 
-        String[] strs = (String[]) typesUpdated.keySet().toArray(new String[0]);
-        for(String type :  strs)
+    public void setDefaultFreq(String timezone, String country){
+        String [] parts = timezone.split("/",0);
+
+        boolean isMetric = true;
+
+        String value = country;
+
+        // only in Europe get continent
+        if (parts[0].equals("Europe"))
         {
-            str2.append("\n").append("type: " + type + "\n")
-                    .append("     -> source sign: " + typesUpdated.get(type).first )
-                    .append("\n")
-                    .append("     -> target sign: " +typesUpdated.get(type).second)
-                    .append("\n");
-
-
-            str =  new Triple<String, String, String>(type , typesUpdated.get(type).first , typesUpdated.get(type).second);
-            list.add(str);
-
-
+            value = parts[0];
         }
-//        return list;
-        return str2;
+
+        if (country.equals("GB"))
+        {
+            value = country;
+        }
+
+        if (value.equals("US"))
+        {
+            isMetric = false;
+        }
+
+        for(String type: typesForConversionList)
+        {
+            if(ViewModel.frequenciesMap == null)
+            {
+                return;
+            }
+            if (!ViewModel.frequenciesMap.containsKey(type))
+            {
+                Frequency newFreq = new Frequency();
+                newFreq.target = "Select an Item...";
+
+
+                if (isMetric)
+                {
+                    if(type.equals("Currency"))
+                    {
+                        newFreq.type = "Currency";
+                        newFreq.source = getCurrency(value);
+//                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "Select an Item..."));
+                    }
+
+                    if(type.equals("Weight")) {
+                        newFreq.type = "Weight";
+                        newFreq.source = "kilogram (kg)";
+//                        frequenciesMap.put(type,new Pair<String, String>("kilogram (kg)", "Select an Item..."));
+                    }
+                    if(type.equals("Length")) {
+                        newFreq.type = "Length";
+                        newFreq.source = "meter (m)";
+//                          frequenciesMap.put(type,new Pair<String, String>("meter (m)", "Select an Item..."));
+                    }
+
+                    if(type.equals("Volume")) {
+                        newFreq.type = "Volume";
+                        newFreq.source = "Liter (L)";
+//                          frequenciesMap.put(type,new Pair<String, String>("Liter (L)", "Select an Item..."));
+                    }
+
+
+                }
+                else
+                {
+                    if(type.equals("Currency")) {
+                        newFreq.type = "Currency";
+
+                        newFreq.source = getCurrency(value);
+//                        frequenciesMap.put(type, new Pair<String, String>(getCurrency(value), "Select an Item..."));
+                    }
+
+                    if(type.equals("Weight")) {
+                        newFreq.type = "Weight";
+
+                        newFreq.source = "pound (lb)";
+//                      frequenciesMap.put(type, new Pair<String, String>("pound (lb)", "Select an Item..."));
+                    }
+
+                    if(type.equals("Length")) {
+                        newFreq.type = "Length";
+                        newFreq.source = "Yard (yd)";
+//                        requenciesMap.put(type, new Pair<String, String>("Yard (yd)", "Select an Item..."));
+                    }
+
+                    if(type.equals("Volume")) {
+                        newFreq.type = "Volume";
+
+                        newFreq.source = "gallon (gal)";
+//                        frequenciesMap.put(type, new Pair<String, String>("gallon (gal)", "Select an Item..."));
+                    }
+                }
+
+                insertToLocalDB(newFreq);
+
+            }
+        }
     }
 
+    // get currency by given country name
+    public String getCurrency(String country)
+    {
+        switch(country)
+        {
+            case "IL":
+            {
+                return "NIS (₪)";
+            }
+            case "US":
+            {
+                return "Dollar ($)";
+            }
+            case "EU":
+            {
+                return "Euro (€)";
+            }
+            case "GB":
+            {
+                return "Pound (£)";
+            }
+            case "JP":
+            {
+                return "Yen (¥)";
+            }
+            case "RU":
+            {
+                return "RUB (\u20BD)";
+            }
+            default:
+                return "";
+        }
+    }
 
-    // create a frequency with the given input from user and then put it into the room db.
+    // create a frequency after the user has pressed the type and then put
     public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency) {
         int array = 0;
 
@@ -271,26 +418,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
                 mTarget.setSelection(spinnerPosition);
 
                 int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Weight"));
-                mTarget2.setSelection(spinnerPosition2);
-            }
-
-        }
-        if (type.equals("Temperature")) {
-            array = R.array.temperature;
-            newFrequency.type = "Temperature";
-
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
-            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            mTarget.setAdapter(adapter);
-            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mTarget2.setAdapter(adapter2);
-            if (ViewModel.frequenciesMap.containsKey("Temperature")) {
-                int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Temperature"));
-                mTarget.setSelection(spinnerPosition);
-
-                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Temperature"));
                 mTarget2.setSelection(spinnerPosition2);
             }
 
@@ -338,43 +465,22 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         }
 
 
-        //select source currency and save on room
-        textView1.setText("choose the source " + type + " type:" );//TODO maybe change instruction
 
-
-
-        //stop the animation
-        if (rope != null) {
-            rope.stop(true);
-        }
-
-        //now choosing the signs from Spinners
+        // now choosing the signs from Spinners
         mTarget.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                //first - delete the previous type was stored
-//                deleteAll(type);
-
-                String currency_selected_source = parent.getItemAtPosition(position).toString();
-                if(currency_selected_source.equals("Select an Item...") || currency_selected_source.equals("update")){
-                    Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                else {
+                    String currency_selected_source = parent.getItemAtPosition(position).toString();
                     Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
-                    //save in ROOM sqlite as default currency TODO
                     newFrequency.source = currency_selected_source;
-
                     getTableAsString(db,"Frequency");
-
                     insertToLocalDB(newFrequency);
                 }
-            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -392,16 +498,10 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 //                //first - delete the previous type was stored
 //                deleteByType(type);
                 String currency_selected_target = parent.getItemAtPosition(position).toString();
-                if(currency_selected_target.equals("Select an Item...") || currency_selected_target.equals("update")){
-                    Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                else {
-                    Toast.makeText(settingsActivity.this, "Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
-                    //save in ROOM sqlite as default target currency TODO
-                    newFrequency.target = currency_selected_target;
-                    insertToLocalDB(newFrequency);
-                }
+                Toast.makeText(settingsActivity.this, "Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
+                newFrequency.target = currency_selected_target;
+                insertToLocalDB(newFrequency);
+
             }
 
             @Override
@@ -415,7 +515,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
 
     /**these methods manage the insertion and deletion from room db**/
-    void insertToLocalDB(Frequency newFrequency) {
+    public void insertToLocalDB(Frequency newFrequency) {
         new insertLocalAsyncTask(db.freqDao()).execute(newFrequency);
     }
 
@@ -426,12 +526,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-
-        if (hasFocus) {
-
-            rope = YoYo.with(Techniques.Tada).duration(1000).playOn(mTarget);// after start,just click mTarget view, rope is not init
-            rope = YoYo.with(Techniques.Tada).duration(1000).playOn(mTarget2);// after start,just click mTarget view, rope is not init
-        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -458,31 +552,17 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         return super.onOptionsItemSelected(item);
     }
 
+
+    // set old (from room db) unit types on spinners after the type was selected by user
     @Override
     public void AdapterClickCallback(String[] freq, int id,  View view) {
 
         Frequency newFrequency = new Frequency();
-        //animate both spinners for user to notice there are fields to choose at top of screen!!!!
+        // animate both spinners for user to notice there are fields to choose at top of screen!
+
         if (rope != null) {
             rope.stop(true);
         }
-        Techniques technique = (Techniques) view.getTag();
-        rope = YoYo.with(technique.Tada)
-                .duration(1200)
-                .repeat(2)
-                .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
-                .interpolate(new AccelerateDecelerateInterpolator())
-                .playOn(mTarget);
-
-
-
-        rope = YoYo.with(technique.Tada)
-                .duration(1200)
-                .repeat(2)
-                .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
-                .interpolate(new AccelerateDecelerateInterpolator())
-                .playOn(mTarget2);
-
 
         if (typesForConversionList[(int) id].equals("Currency")) {
             setTypesSelected("Currency", textView, textView2, newFrequency );

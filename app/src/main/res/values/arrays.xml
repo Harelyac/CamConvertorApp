@@ -5,37 +5,22 @@
     <string-array name="currencies">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-        <item>Dollar ($)</item> // only usd changed
-        <item>Cent (&#162;)</item>
-        <item>Pound (&#163;)</item>
-        <item>Yen (&#165;)</item>
-        <item>Rial (&#65020;)</item>
-        <item>Euro (&#8364;)</item> // only euro changed
-        <item>NIS (&#8362;)</item>
-        <item>RUB (₽)</item>
+        <item>Dollar ($)</item> // states
+        <item>Pound (&#163;)</item> // england
+        <item>Euro (&#8364;)</item> // europe
+        <item>Yen (&#165;)</item> // japan
+        <item>RUB (₽)</item> // russia
     </string-array>
-    NIS (&#8362;
-    <string-array name="temperature">
-        <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
-        <item>degree Celsius (°C)</item>
-        <item>degree Fahrenheit (°F)</item>
-        <item>degree Rankine </item>
-        <item>degree Reaumur </item>
-        <item>degree kelvin (&#8490;)</item>
-    </string-array>
+
 
 
     <string-array name="length">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-        <item>kilometer (km)</item>
-        <item>meter (m)</item>
-        <item>decimeter (dm)</item>
-        <item>centimeter (cm)</item>
-        <item>milimeter (mm)</item>
-        <item>micrometer (&#181;m)</item>
-        <item>Angstram (&#8491;)</item>
+        <item>Kilometer (km)</item>
+        <item>Meter (m)</item>
+        <item>Centimeter (cm)</item>
+        <item>Milimeter (mm)</item>
         <item>Mile (mi)</item>
         <item>Yard (yd)</item>
         <item>Foot (ft)</item>
@@ -46,11 +31,8 @@
     <string-array name="weights">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
-        <item>kilogram (kg)</item>
-        <item>pound (lb)</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
+        <item>Kilogram (kg)</item>
+        <item>Pound (lb)</item>
     </string-array>
 
 
@@ -58,73 +40,41 @@
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
         <item>Select an Item...</item>
         <item>Liter (L)</item>
-        <item>gallon (gal)</item>
-        <item>update</item>
-        <item>update</item>
-        <item>update</item>
+        <item>Gallon (gal)</item>
     </string-array>
 
     <string-array name="title">
 
         <item>Help</item>
-
+        <item>Change Types</item>
         <item>About Us</item>
-
-        <item>Settings</item>
-
-        <item>Default Types</item>
-
-        <item>Null</item>
-
-        <item>Sync Types</item>
-
-        <item>Write Us!</item>
+        <item>Selected Types</item>
+        <item>Write Us</item>
 
 
     </string-array>
 
     <integer-array name="images">
-
-        <item>@android:drawable/ic_menu_camera</item>
-
-        <item>@drawable/currencies</item>
-
+        <item>@drawable/currencies2</item>
+        <item>@drawable/currencies2</item>
+        <item>@drawable/currencies2</item>
+        <item>@drawable/currencies2</item>
         <item>@drawable/currencies2</item>
 
-        <!--<item>@drawable/currencies3</item>-->
 
-        <!--<item>@drawable/currencies4</item>-->
-
-        <!--<item>@drawable/currencies5</item>-->
-
-        <item>@android:drawable/ic_menu_camera</item>
-
-        <item>@android:drawable/ic_menu_camera</item>
-
-        <item>@android:drawable/ic_menu_camera</item>
-
-
-        <item>@android:drawable/ic_menu_camera</item>
-        <!--<item>@android:drawable/ic_menu_camera</item>-->
 
     </integer-array>
 
     <integer-array name="colors">
 
 
+        <item>@color/sample_yellow</item>
         <item>@color/theme_yellow_accent</item>
+        <item>@color/sample_yellow</item>
+        <item>@color/theme_yellow_accent</item>
+        <item>@color/sample_yellow</item>
 
-        <item>@color/theme_yellow_accent</item>
 
-        <item>@color/theme_yellow_accent</item>
-
-        <item>@color/theme_yellow_accent</item>
-
-        <item>@color/theme_yellow_accent</item>
-
-        <item>@color/theme_yellow_accent</item>
-
-        <item>@color/theme_yellow_accent</item>
 
     </integer-array>
 </resources>

@@ -15,14 +15,14 @@ public class Rate {
 
     public float getConversionRate(String baseRateName, String targetRateName) {
         Map<String, Float> rates = new HashMap<String, Float>();
-        rates.put("NIS (₪)",ILS);
+        rates.put("NIS (₪)",ILS); // we wont use it, firebase can't identify it
         rates.put("Euro (€)",EUR);
         rates.put("Dollar ($)",USD);
         rates.put("AUD",AUD); // sign same as dollar, we wont use it
         rates.put("CAD",CAD); // sign same as dollar, we wont use it
         rates.put("Pound (£)",GBP);
-        rates.put("Yen (¥)",JPY); // yen, japan
-        rates.put("RUB (\u20BD)",RUB); // rubel, russia
+        rates.put("Yen (¥)",JPY);
+        rates.put("RUB (\u20BD)",RUB);
 
         Float baseRate = rates.get(baseRateName);
         Float targetRate = rates.get(targetRateName);

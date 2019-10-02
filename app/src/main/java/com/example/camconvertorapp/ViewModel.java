@@ -3,29 +3,36 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import kotlin.Triple;
-
+import com.example.camconvertorapp.settingsActivity;
 
 public class ViewModel extends androidx.lifecycle.ViewModel
 {
-    // maybe we dont need it because now we have the "ConversionTypeToSigns" FIXME
-    String typesForConversionList[] = {"Currency", "Weight", "Temperature", "Length", "Volume"};
-    
-    public static HashMap<String, ArrayList<String>> ConversionTypeToSigns = new HashMap<String,ArrayList<String>>();// create hash map - key: unit type , value: set of all signs of that type
+    String typesForConversionList[] = {"Currency", "Weight", "Length", "Volume"};
+
+    // create hash map - key: unit type , value: set of all signs of that type
+    public static HashMap<String, ArrayList<String>> ConversionTypeToSigns = new HashMap<String,ArrayList<String>>();
 
     // key - frequency , value - (source,target)
     public static HashMap<String, Pair<String, String>> frequenciesMap = new HashMap<String, Pair<String, String>>();
 
 
+    // key - unit type , value - rate compare to 'base rate' (on each type certain base rate was chosen)
+    public static HashMap<String, Float> ratioToBase = new HashMap<String, Float>();
+
+
+
+    // can be saved on sp also
     public void initHashMap()
+
     {
+
+        // init ConversionTypeToSigns hashmap
         ConversionTypeToSigns.put("Currency", new ArrayList<String>());
         ConversionTypeToSigns.get("Currency").add("$");
         ConversionTypeToSigns.get("Currency").add("€");
         ConversionTypeToSigns.get("Currency").add("£");
         ConversionTypeToSigns.get("Currency").add("¥");
-        ConversionTypeToSigns.get("Currency").add("₪");
         ConversionTypeToSigns.get("Currency").add("\u20BD");
 
 
@@ -34,20 +41,40 @@ public class ViewModel extends androidx.lifecycle.ViewModel
         ConversionTypeToSigns.get("Weight").add("lb"); // pound
 
 
-        ConversionTypeToSigns.put("Temperature", new ArrayList<String>());
-        ConversionTypeToSigns.get("Temperature").add("°C"); // part of the metric system
-        ConversionTypeToSigns.get("Temperature").add("°F"); // used in usa (but not actually in the imperial metric system)
-
 
         ConversionTypeToSigns.put("Length", new ArrayList<String>());
+        ConversionTypeToSigns.get("Length").add("km");
         ConversionTypeToSigns.get("Length").add("m");
-        ConversionTypeToSigns.get("Length").add("yd"); // yard
-
+        ConversionTypeToSigns.get("Length").add("cm");
+        ConversionTypeToSigns.get("Length").add("mm");
+        ConversionTypeToSigns.get("Length").add("mi");
+        ConversionTypeToSigns.get("Length").add("yd");
+        ConversionTypeToSigns.get("Length").add("ft");
+        ConversionTypeToSigns.get("Length").add("in");
 
         ConversionTypeToSigns.put("Volume", new ArrayList<String>());
         ConversionTypeToSigns.get("Volume").add("L");
-        ConversionTypeToSigns.get("Volume").add("gal"); // pound
+        ConversionTypeToSigns.get("Volume").add("gal");
+
+
+        // init ratioToBase hashmap (all but currency)
+        ratioToBase.put("Kilogram (kg)",1.f);
+        ratioToBase.put("Pound (lb)",0.453592f);
+
+        ratioToBase.put("Liter (L)",1.f);
+        ratioToBase.put("Gallon (gal)",3.78541f);
+
+        ratioToBase.put("Kilometer (km)",1.f);
+        ratioToBase.put("Meter (m)",0.001f);
+        ratioToBase.put("Centimeter (cm)",0.00001f);
+        ratioToBase.put("Milimeter (mm)",0.0000001f);
+        ratioToBase.put("Mile (mi)",1.60934f);
+        ratioToBase.put("Yard (yd)",0.0009144f);
+        ratioToBase.put("Foot (ft)",0.0003048f);
+        ratioToBase.put("Inch (in)",0.0000254f);
+
     }
+
 
 
     // return target by conversion type
@@ -98,15 +125,29 @@ public class ViewModel extends androidx.lifecycle.ViewModel
 
 
 
-    // check if useer hasn't selected all types and moves to another activity
+    // check if user hasn't selected all types and moves to another activity
+    // if the target is empty ~
     public boolean checkIfNotAllTypesSelected() {
+        // we start positive
         boolean isTrue = false;
-        for (String type : typesForConversionList) {
-            if (this.frequenciesMap == null) {
-                return true;
+
+        if (frequenciesMap == null) {
+            return true;
+        }
+
+        for (String type : typesForConversionList)
+        {
+            if (!frequenciesMap.containsKey(type))
+            {
+                isTrue = true;
             }
-            if (!this.frequenciesMap.containsKey(type)) {
-                isTrue = false;
+            else
+            {
+                // why it's not working? #FIXME
+                if ((frequenciesMap.get(type)).second.equals("Select an item..."))
+                {
+                    isTrue = true;
+                }
             }
         }
         return isTrue;
@@ -114,7 +155,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel
 
 
 
-    // maybe for debug purposes
+    // for alert dialog
     public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
         Triple<String,String, String> str ;
         ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
@@ -139,109 +180,5 @@ public class ViewModel extends androidx.lifecycle.ViewModel
         return str2;
     }
 
-    // set default conversion types source unit based on location - metric or imperial base unit types
-    // and currency of country / region only on conversion types that was not set yet
 
-    public void setDefaultFreq(String timezone, String country){
-        String [] parts = timezone.split("/",0);
-
-        boolean isMetric = true;
-
-        String value = country;
-
-        // only in Europe get continent
-        if (parts[0].equals("Europe"))
-        {
-            value = parts[0];
-        }
-
-        if (country.equals("GB"))
-        {
-            value = country;
-        }
-
-        if (value.equals("US"))
-        {
-            isMetric = false;
-        }
-
-        for(String type: typesForConversionList)
-        {
-            if(frequenciesMap == null)
-            {
-                return;
-            }
-            if (!frequenciesMap.containsKey(type))
-            {
-                if (isMetric)
-                {
-                    if(type.equals("Currency"))
-                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "update"));
-
-                    if(type.equals("Weight"))
-                        frequenciesMap.put(type,new Pair<String, String>("kilogram (kg)", "update"));
-
-                    if(type.equals("Temperature"))
-                        frequenciesMap.put(type,new Pair<String, String>("degree Celsius (°C)", "update"));
-
-                    if(type.equals("Length"))
-                        frequenciesMap.put(type,new Pair<String, String>("meter (m)", "update"));
-
-                    if(type.equals("Volume"))
-                        frequenciesMap.put(type,new Pair<String, String>("Liter (L)", "update"));
-                }
-                else
-                {
-                    if(type.equals("Currency"))
-                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "update"));
-
-                    if(type.equals("Weight"))
-                        frequenciesMap.put(type,new Pair<String, String>("pound (lb)", "update"));
-
-                    if(type.equals("Temperature"))
-                        frequenciesMap.put(type,new Pair<String, String>("degree Fahrenheit (°F)", "update"));
-
-                    if(type.equals("Length"))
-                        frequenciesMap.put(type,new Pair<String, String>("Yard (yd)", "update"));
-
-                    if(type.equals("Volume"))
-                        frequenciesMap.put(type,new Pair<String, String>("gallon (gal)", "update"));
-                }
-            }
-        }
-    }
-
-    // get currency by given country name
-    public String getCurrency(String country)
-    {
-        switch(country)
-        {
-            case "IL":
-            {
-                return "NIS (₪)";
-            }
-            case "US":
-            {
-                return "Dollar ($)";
-            }
-            case "EU":
-            {
-                return "Euro (€)";
-            }
-            case "GB":
-            {
-                return "Pound (£)";
-            }
-            case "JP":
-            {
-                return "Yen (¥)";
-            }
-            case "RU":
-            {
-                return "RUB (\u20BD)";
-            }
-            default:
-                return "";
-        }
-    }
 }

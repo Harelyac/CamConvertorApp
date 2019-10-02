@@ -66,6 +66,15 @@ dependencies {
     // Retrofit2 and Gson dependencies for Fixer.io currency conversion rates.
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.11.2'
+
+    // picaso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // tapbar
+    implementation 'com.github.michaldrabik:TapBarMenu:1.0.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

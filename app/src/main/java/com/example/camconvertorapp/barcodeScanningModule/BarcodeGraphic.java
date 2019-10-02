@@ -11,64 +11,61 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.example.camconvertorapp.textxRecognitionModule;
+package com.example.camconvertorapp.barcodeScanningModule;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
-import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
-import com.example.camconvertorapp.cameraModule.GraphicOverlay.Graphic;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 
-/**
- * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
- * overlay view.
- */
-public class TextGraphic extends Graphic {
+
+/** Graphic instance for rendering Barcode position and content information in an overlay view. */
+public class BarcodeGraphic extends GraphicOverlay.Graphic {
 
   private static final int TEXT_COLOR = Color.WHITE;
   private static final float TEXT_SIZE = 54.0f;
   private static final float STROKE_WIDTH = 4.0f;
 
   private final Paint rectPaint;
-  private final Paint textPaint;
-  private final String text;
-  private final Rect boundingBox;
+  private final Paint barcodePaint;
+  private final FirebaseVisionBarcode barcode;
 
-  TextGraphic(GraphicOverlay overlay, String text, Rect rect) {
+  BarcodeGraphic(GraphicOverlay overlay, FirebaseVisionBarcode barcode) {
     super(overlay);
 
-    this.text = text;
-    boundingBox = rect;
+    this.barcode = barcode;
+
     rectPaint = new Paint();
     rectPaint.setColor(TEXT_COLOR);
     rectPaint.setStyle(Paint.Style.STROKE);
     rectPaint.setStrokeWidth(STROKE_WIDTH);
 
-    textPaint = new Paint();
-    textPaint.setColor(TEXT_COLOR);
-    textPaint.setTextSize(TEXT_SIZE);
+    barcodePaint = new Paint();
+    barcodePaint.setColor(TEXT_COLOR);
+    barcodePaint.setTextSize(TEXT_SIZE);
   }
 
-  /** Draws the text block annotations for position, size, and raw value on the supplied canvas. */
+  /**
+   * Draws the barcode block annotations for position, size, and raw value on the supplied canvas.
+   */
   @Override
   public void draw(Canvas canvas) {
-    if (text == null) {
-      throw new IllegalStateException("Attempting to draw a null text.");
+    if (barcode == null) {
+      throw new IllegalStateException("Attempting to draw a null barcode.");
     }
 
-    // Draws the bounding box around the TextBlock.
-    RectF rect = new RectF(boundingBox);
+    // Draws the bounding box around the BarcodeBlock.
+    RectF rect = new RectF(barcode.getBoundingBox());
     rect.left = translateX(rect.left);
     rect.top = translateY(rect.top);
     rect.right = translateX(rect.right);
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, rectPaint);
 
-    // Renders the text at the bottom of the box.
-    canvas.drawText(text, rect.left, rect.bottom, textPaint);
+    // Renders the barcode at the bottom of the box.
+    canvas.drawText(barcode.getRawValue(), rect.left, rect.bottom, barcodePaint);
   }
 }

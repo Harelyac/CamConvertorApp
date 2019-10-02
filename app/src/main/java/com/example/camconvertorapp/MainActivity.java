@@ -6,10 +6,8 @@ import android.os.Bundle;
 
 import com.example.camconvertorapp.locationModule.IpApi;
 import com.example.camconvertorapp.locationModule.Response;
-import com.daimajia.androidanimations.library.Techniques;
 import com.eftimoff.androipathview.PathView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.igalata.bubblepicker.BubblePickerListener;
 import com.igalata.bubblepicker.adapter.BubblePickerAdapter;
 import com.igalata.bubblepicker.model.BubbleGradient;
@@ -24,7 +22,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import nl.dionsegijn.konfetti.KonfettiView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -34,13 +31,15 @@ import android.transition.Slide;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.daimajia.androidanimations.library.YoYo;
 
+import com.michaldrabik.tapbarmenulib.TapBarMenu;
+
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,11 +47,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 
+
+
 public class MainActivity extends AppCompatActivity {
     public ViewModel viewModel;
     public AppDatabase db;
-    public Response IpResponse;
 
+
+    private static final String TEXT_DETECTION = "Text Detection";
+    private static final String BARCODE_DETECTION = "Barcode Detection";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,31 +78,53 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // FIXME - need to find a an api to get location
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://ipinfo.io/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        IpApi ipApi = retrofit.create(IpApi.class);
-        Call<Response> call = ipApi.getResponse();
-        call.enqueue(new Callback<Response>() {
+        final TapBarMenu tapBarMenu = findViewById(R.id.tapBarMenu);
+
+        tapBarMenu.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                if (!response.isSuccessful()) {
-                    Log.d("", "onResponse: " + response.toString());
-                    return;
-                }
-                // if successful!
-                IpResponse = response.body();
-                viewModel.setDefaultFreq(IpResponse.timezone, IpResponse.country);
-                Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                tapBarMenu.toggle();
             }
+        });
 
+        final ImageView convertor = findViewById(R.id.item1);
+        final ImageView barcode = findViewById(R.id.item2);
+
+        convertor.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
-                Log.e("", "Exception: "+Log.getStackTraceString(t));
+            public void onClick(View v) {
+                // check if room db has not be initialized
+                boolean hasNotInit = viewModel.checkIfNotAllTypesSelected();
+
+                if (hasNotInit) {
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                    //the user didnt define all types conversions - notice him:
+                    alertDialog.setTitle("Hi mate!");
+                    alertDialog.setMessage("you did not set all conversion types");
+                    alertDialog.setPositiveButton("ALRIGHT", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // viewModel.setDefaultFreq();
+                            startActivity(new Intent(MainActivity.this, settingsActivity.class));
+                        }
+                    });
+                }
+                else
+                {
+                    cameraActivity.model = TEXT_DETECTION;
+                    startActivity(new Intent(MainActivity.this, cameraActivity.class));
+                }
+
+            }
+        });
+
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraActivity.model = BARCODE_DETECTION;
+                startActivity(new Intent(MainActivity.this, cameraActivity.class));
             }
         });
 
@@ -107,48 +132,25 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        // start of animations
         Toolbar toolbar = findViewById(R.id.toolbar);
-
         PathView pathView= findViewById(R.id.path);
+
         pathView.getSequentialPathAnimator()
                 .delay(100)
                 .interpolator(new AccelerateDecelerateInterpolator())
                 .start();
 
-
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setBackgroundResource(R.color.theme_yellow_accent);
-
-        TextView text = findViewById(R.id.title1);
-
-
-        YoYo.with(Techniques.Tada)
-                .duration(1200)
-                .repeat(YoYo.INFINITE)
-                .pivot(YoYo.CENTER_PIVOT, YoYo.CENTER_PIVOT)
-                .interpolate(new AccelerateDecelerateInterpolator())
-                .playOn(fab);
-
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), cameraActivity.class));
-            }
-        });
-
-        KonfettiView konfettiView = findViewById(R.id.viewKonfetti);
         BubblePicker bubblePicker = findViewById(R.id.picker);
-
 
         final String[] titles = getResources().getStringArray(R.array.title);
         final TypedArray colors = getResources().obtainTypedArray(R.array.colors);
         final TypedArray images = getResources().obtainTypedArray(R.array.images);
 
-
-        bubblePicker.setAdapter(new BubblePickerAdapter() {
+        bubblePicker.setAdapter(new BubblePickerAdapter()
+        {
             @Override
             public int getTotalCount() {
                 return titles.length;
@@ -158,151 +160,141 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public PickerItem getItem(int position) {
                 PickerItem item = new PickerItem();
+
                 item.setTitle(titles[position]);
+
                 item.setGradient(new BubbleGradient(colors.getColor((position * 2) % 8, 0),
                         colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL));
 
                 item.setGradient(new BubbleGradient(colors.getColor(position , 0),
                         colors.getColor(position , 0), BubbleGradient.VERTICAL));
-                item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.black));
+
+                item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
                 item.setTextSize(80);
                 item.setBackgroundImage(ContextCompat.getDrawable(MainActivity.this, images.getResourceId(position, 0)));
                 return item;
             }
         });
+
         bubblePicker.setCenterImmediately(true);
-        bubblePicker.setBubbleSize(58);
+        bubblePicker.setBubbleSize(80);
 
         bubblePicker.setListener(new BubblePickerListener() {
             @Override
             public void onBubbleSelected(@NotNull PickerItem item) {
 
-                if ( item.component1().equals("Settings")){
+                if ( item.component1().equals("Change Types")){
                     startActivity(new Intent(getApplicationContext(), settingsActivity.class));
                 }
 
-                if ( item.component1().equals("Default Types")){
-
-                    final HashMap<String, Pair<String, String>> typesUpdated =  viewModel.getAllTypesStored();
-
-
-                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                if ( item.component1().equals("Selected Types")) {
+                    final HashMap<String, Pair<String, String>> typesUpdated = viewModel.getAllTypesStored();
                     final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
-                    boolean hasNotInit = viewModel.checkIfNotAllTypesSelected();
-                    if(ViewModel.frequenciesMap.isEmpty()){
-                        //the user is first time on App. send him to settings
-                        alertDialog.setTitle("hi, new user!");
-                        alertDialog.setMessage("tell us what types/signs you would like to convert");
-                        alertDialog.setPositiveButton("GO TO SETTINGS", new DialogInterface.OnClickListener() {
+                    alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
+                    alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                    alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
 
-//                                viewModel.setDefaultFreq();
-                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+                            dialog.cancel();
+                        }
+                    });
 
-                                dialog.cancel();
-                            }
-                        });
+                    alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
 
-                        alertDialog.setNegativeButton("use default types", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                                alertDialog2.setTitle("Default Types");
-                                alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
-                                alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-//                                viewModel.setDefaultFreq();
-                                        startActivity(new Intent(getApplicationContext(), settingsActivity.class));
-
-                                        dialog.cancel();
-                                    }
-                                });
-
-                                alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
-                                AlertDialog alert1 = alertDialog2.create();
-
-                                alert1.show();
-                            }
-                        });
-
-                        AlertDialog alert = alertDialog.create();
-
-                        alert.show();
-                    }
-
-                    //otherwise - ask user whether to use his previous types
-                    else {
-                        alertDialog.setTitle("hi again!");
-                        alertDialog.setMessage("use conversion types from previous session?");
-                        alertDialog.setPositiveButton("YES, SHOW ME SELECTED TYPES", new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                                alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
-                                alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
-                                alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-//                                viewModel.setDefaultFreq();
-                                        startActivity(new Intent(getApplicationContext(), settingsActivity.class));
-
-                                        dialog.cancel();
-                                    }
-                                });
-
-                                alertDialog2.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
-                                AlertDialog alert1 = alertDialog2.create();
-
-                                alert1.show();
-                            }
-                        });
-
-                        alertDialog.setNegativeButton("USE DIFFERENT TYPES", new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
-                                dialog.cancel();
-                            }
-                        });
-
-                        AlertDialog alert = alertDialog.create();
-
-                        alert.show();
-
-                    }
-
-
-
-
-                }
-                if ( item.component1().equals("Write Us")) {
-
+                    AlertDialog alert1 = alertDialog2.create();
+                    alert1.show();
                 }
 
+                if (item.component1().equals("Write Us!"))
+                {
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setTitle("God a question? we'd love to hear from you. Send us a message and we'll respond ASAP");
+
+                    final EditText name = new EditText(MainActivity.this);
+                    name.setHeight(100);
+                    name.setWidth(340);
+                    name.setGravity(Gravity.LEFT);
+
+                    /*final EditText body = new EditText(MainActivity.this);
+                    body.setHeight(100);
+                    body.setWidth(340);
+                    body.setGravity(Gravity.LEFT);*/
+
+                    alert.setView(name);
+
+                    // sending the mail from user to harel's mail address
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("message/rfc822");
+                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"harelyac@gmail.com"});
+                    i.putExtra(Intent.EXTRA_SUBJECT, "put title here");
+                    i.putExtra(Intent.EXTRA_TEXT   , "put body here");
+                    try {
+                        startActivity(Intent.createChooser(i, "Send mail..."));
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                if (item.component1().equals("About Us"))
+                {
+                    final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
+                    alertDialog2.setTitle("Hi There!");
+                    alertDialog2.setMessage("A bit info about the developers who build this app: \n \n"
+                    + "Harel Yacovian - third year student in CS at the Hebrew University\n \n" +
+                                            "Daniel Hazan - Junior Full Stack Developer at Freelance");
 
 
+                    alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alert1 = alertDialog2.create();
+                    alert1.show();
+                }
+
+                if (item.component1().equals("Help"))
+                {
+                    final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
+                    alertDialog2.setTitle("Hi There!");
+                    alertDialog2.setMessage("Wonder How to use this app? \n" +
+                    "Hopefully you are holding any product attached with Numerical/Barcode \n\n" +
+                    "1.First, decide what function you want to use - " +
+                            "our Barcode Scanner or Price Convertor \n \n" +
+                    "2.If you use the Convertor (left side) - firstly, you may need to go to " +
+                            "'Change Types' and fill in all the relevant fields; e.g , if you want to convert price from Euro to" +
+                            " Dollar - then select in the 'Currency' field the source and target signs." +
+                            "\n Then click  on 'Submit' button and your selection will be saved for later use \n \n" +
+                    "3.Now you are ready to convert the types you've selected \n \n" +
+                    "--------------------------------------------- \n \n" +
+                    "4.If you use the Barcode reader (right side) - just look for the barcode " +
+                            "on the item that you want to detect, if the items exist on google good chance you will get an image and its \n" +
+                                    "current price on market");
+
+
+                    alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alert1 = alertDialog2.create();
+                    alert1.show();
+                }
             }
 
             @Override
@@ -347,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    // not used at the moment
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

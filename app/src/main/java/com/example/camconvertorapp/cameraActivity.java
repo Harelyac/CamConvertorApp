@@ -4,24 +4,23 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.camconvertorapp.barcodeScanningModule.BarcodeScanningProcessor;
 import com.example.camconvertorapp.cameraModule.CameraSource;
 import com.example.camconvertorapp.cameraModule.CameraSourcePreview;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
-import com.example.camconvertorapp.textxRecognitionModule.TextRecognitionProcessor;
+import com.example.camconvertorapp.textRecognitionModule.TextRecognitionProcessor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
-import kotlin.Triple;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -30,8 +29,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class cameraActivity extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback{
 
-    // Fields.
-    private static final String TEXT_DETECTION = "Text Detection";
+
+    public static String model;
     private static final String TAG = "LivePreviewActivity";
     private static final int PERMISSION_REQUESTS = 1;
 
@@ -39,7 +38,7 @@ public class cameraActivity extends AppCompatActivity
     private CameraSourcePreview preview;
     private GraphicOverlay graphicOverlay;
 
-    TextView fixerRate;
+    public static EditText detectedValue;
     Response fixerResponse;
 
     private String baseCurrency = "ILS";
@@ -47,14 +46,13 @@ public class cameraActivity extends AppCompatActivity
     private float conversionRate = 1.0f;
 
     private TextRecognitionProcessor textRecognitionProcessor;
-
     private ViewModel viewModel;
 
     // MainActivity main OnCreate method.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_activity);
+        setContentView(R.layout.activity_camera);
 
         // Set camera source and overlay.
         preview = (CameraSourcePreview) findViewById(R.id.firePreview);
@@ -66,49 +64,71 @@ public class cameraActivity extends AppCompatActivity
             Log.d(TAG, "graphicOverlay is null");
         }
 
+
+        // load views
+        detectedValue = findViewById(R.id.detectedValue);
+        detectedValue.setInputType(0);
+
         // generate the object
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+
+        // init all hashmaps needed
         viewModel.initHashMap();
 
-        // fixerRate = (TextView) findViewById(R.id.conversionRate);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://data.fixer.io/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        // if we are on a convert mode, try to fetch up to date rates with restful
+        if (model.equals("Text Detection"))
+        {
+            textRecognitionProcessor = new TextRecognitionProcessor();
 
-        FixerApi fixerApi = retrofit.create(FixerApi.class);
-        Call<Response> call = fixerApi.getResponse();
-        call.enqueue(new Callback<Response>() {
-            @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                if (!response.isSuccessful()) {
-                    fixerRate.setText("Code: " + response.code());
-                    return;
-                }
-                    // if successful!
+            // set the conversion rates for the chosen unit types
+            float weightconversionRate  = viewModel.ratioToBase.get(viewModel.getSourceByFrequencyType("Weight")) / viewModel.ratioToBase.get(viewModel.getTargetByFrequencyType("Weight"));
+            textRecognitionProcessor.setConversionRate("Weight", weightconversionRate);
+
+            float lengthconversionRate  = viewModel.ratioToBase.get(viewModel.getSourceByFrequencyType("Length")) / viewModel.ratioToBase.get(viewModel.getTargetByFrequencyType("Length"));
+            textRecognitionProcessor.setConversionRate("Length",lengthconversionRate);
+
+            float volumeconversionRate  = viewModel.ratioToBase.get(viewModel.getSourceByFrequencyType("Volume")) / viewModel.ratioToBase.get(viewModel.getTargetByFrequencyType("Volume"));
+            textRecognitionProcessor.setConversionRate("Volume",volumeconversionRate);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://data.fixer.io/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            FixerApi fixerApi = retrofit.create(FixerApi.class);
+            Call<Response> call = fixerApi.getResponse();
+            call.enqueue(new Callback<Response>() {
+                @Override
+                public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                    if (!response.isSuccessful()) {
+                        return;
+                    }
+                    // if successful!, update currencies rates
                     fixerResponse = response.body();
-                    HashMap<String, Pair<String, String>> allTypes = viewModel.getAllTypesStored();
+
+                    // the base assumption here is that, that we are on camera activity and all types has been set already
                     baseCurrency = ViewModel.getSourceByFrequencyType("Currency");
                     targetCurrency = ViewModel.getTargetByFrequencyType("Currency");
                     conversionRate = fixerResponse.rates.getConversionRate(baseCurrency, targetCurrency);
-                    textRecognitionProcessor.setConversionRate(conversionRate);
+
+                    // set the conversion rate for currency
+                    textRecognitionProcessor.setConversionRate("Currency",conversionRate);
                     Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
-            }
+                }
 
-            @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Exception: "+Log.getStackTraceString(t));
-            }
-        });
-
-
+                @Override
+                public void onFailure(Call<Response> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Exception: "+Log.getStackTraceString(t));
+                }
+            });
+        }
 
 
         // Check permissions and start camera.
         if (allPermissionsGranted()) {
-            createCameraSource();
+            createCameraSource(model);
         } else {
             getRuntimePermissions();
         }
@@ -116,41 +136,24 @@ public class cameraActivity extends AppCompatActivity
     }
 
 
-    // use it just to notify the user about the chosen unit types
-    public StringBuilder getAllTypesOrdered(HashMap<String, Pair<String,String>> typesUpdated){
-        Triple<String,String, String> str ;
-        ArrayList<Triple<String,String,String>> list = new ArrayList<Triple<String, String, String>>();
-        StringBuilder str2  = new StringBuilder();
-
-        String[] strs = (String[]) typesUpdated.keySet().toArray(new String[0]);
-        for(String type :  strs)
-        {
-            str2.append("\n").append("type: " + type + "\n")
-                    .append("     -> source sign: " + typesUpdated.get(type).first )
-                    .append("\n")
-                    .append("     -> target sign: " +typesUpdated.get(type).second)
-                    .append("\n");
-
-
-            str =  new Triple<String, String, String>(type , typesUpdated.get(type).first , typesUpdated.get(type).second);
-            list.add(str);
-
-
-        }
-//        return list;
-        return str2;
-    }
-
     // Camera
-    private void createCameraSource() {
+    private void createCameraSource(String model) {
         // If there's no existing cameraSource, create one.
-        if (cameraSource == null) {
+        if (cameraSource == null)
+        {
             cameraSource = new CameraSource(this, graphicOverlay);
         }
-
-        Log.i(TAG, "Using Text Detector Processor");
-        textRecognitionProcessor = new TextRecognitionProcessor();
-        cameraSource.setMachineLearningFrameProcessor(textRecognitionProcessor);
+        if(model.equals("Text Detection"))
+        {
+            Log.i(TAG, "Using Text Detector Processor");
+            textRecognitionProcessor = new TextRecognitionProcessor();
+            cameraSource.setMachineLearningFrameProcessor(textRecognitionProcessor);
+        }
+        else
+        {
+            Log.i(TAG, "Using Barcode Detector Processor");
+            cameraSource.setMachineLearningFrameProcessor(new BarcodeScanningProcessor());
+        }
     }
 
     /**
@@ -244,7 +247,7 @@ public class cameraActivity extends AppCompatActivity
             int requestCode, String[] permissions, int[] grantResults) {
         Log.i(TAG, "Permission granted!");
         if (allPermissionsGranted()) {
-            createCameraSource();
+            createCameraSource(model);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }

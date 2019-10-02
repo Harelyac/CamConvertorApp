@@ -11,13 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.example.camconvertorapp.textxRecognitionModule;
+package com.example.camconvertorapp.textRecognitionModule;
 
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.example.camconvertorapp.ViewModel;
-import com.example.camconvertorapp.currencyModule.Rate;
+import com.example.camconvertorapp.cameraActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -28,12 +28,11 @@ import com.example.camconvertorapp.cameraModule.FrameMetadata;
 import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.VisionProcessorBase;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Processor for the text recognition demo.
@@ -52,6 +51,8 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
     private String conversion_type = "";
     private final FirebaseVisionTextRecognizer detector;
 
+    // key - unit type , value - rate compare to 'base rate' (on each type certain base rate was chosen)
+    public static HashMap<String, Float> coversionRateMap = new HashMap<String, Float>();
 
     public TextRecognitionProcessor()
     {
@@ -116,7 +117,7 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                         }
 
 
-                        // check
+                        // check the target sign based on conversion type
                         target_sign = ViewModel.getTargetByFrequencyType(conversion_type);
 
 
@@ -125,17 +126,20 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
                             target_sign = target_sign.substring(target_sign.indexOf("(") + 1, target_sign.indexOf(")"));
 
                             temp_sign = ViewModel.getSourceByFrequencyType(conversion_type);
-                            // check if the source identified is not what actually being configured on room
+                            // check if the source sign that was detected is not what actually being configured on room
                             if (!source_sign.equals(temp_sign.substring(temp_sign.indexOf("(") + 1, temp_sign.indexOf(")"))))
                             {
                                 continue;
                             }
 
-                            target_price = source_price * conversionRate;
+                            target_price = source_price * coversionRateMap.get(conversion_type);
 
                             // output the target price concatenated with the target sign
                             GraphicOverlay.Graphic priceGraphic = new TextGraphic(graphicOverlay,
                                     String.valueOf(target_price) + target_sign, elements.get(k).getBoundingBox());
+
+
+                            cameraActivity.detectedValue.setText(Double.toString(target_price) + " " + target_sign);
                             graphicOverlay.add(priceGraphic);
                         }
                     }
@@ -156,7 +160,10 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
         Log.w(TAG, "Text detection failed." + e);
     }
 
-    public void setConversionRate(float newConversionRate) {
-        conversionRate = newConversionRate;
+
+    // being called from outside class before converting
+    public void setConversionRate(String type, float newConversionRate)
+    {
+        coversionRateMap.put(type,newConversionRate);
     }
 }
