@@ -94,8 +94,8 @@ public class TextRecognitionProcessor extends VisionProcessorBase<FirebaseVision
 
                     try {
                         source_price = Float.parseFloat(elements.get(k).getText());
-                        if(k < elements.size() - 1){
-                            source_sign = elements.get(k+1).getText();
+                        if(k > 0){
+                            source_sign = elements.get(k-1).getText();
                         }
 
                         if ((source_sign != null))

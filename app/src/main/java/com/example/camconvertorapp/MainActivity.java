@@ -2,10 +2,9 @@ package com.example.camconvertorapp;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
-import com.example.camconvertorapp.locationModule.IpApi;
-import com.example.camconvertorapp.locationModule.Response;
 import com.eftimoff.androipathview.PathView;
 
 import com.igalata.bubblepicker.BubblePickerListener;
@@ -22,13 +21,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.transition.Slide;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
@@ -40,6 +34,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -110,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(new Intent(MainActivity.this, settingsActivity.class));
                         }
                     });
+
+                    AlertDialog alert1 = alertDialog.create();
+                    alert1.show();
                 }
                 else
                 {
@@ -169,79 +167,120 @@ public class MainActivity extends AppCompatActivity {
                 item.setGradient(new BubbleGradient(colors.getColor(position , 0),
                         colors.getColor(position , 0), BubbleGradient.VERTICAL));
 
-                item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
-                item.setTextSize(80);
+                item.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_blue_dark));
+                item.setTextSize(60);
                 item.setBackgroundImage(ContextCompat.getDrawable(MainActivity.this, images.getResourceId(position, 0)));
+
+                Typeface typeface = Typeface.create("serif", Typeface.BOLD);
+                item.setTypeface(typeface);
                 return item;
             }
         });
 
         bubblePicker.setCenterImmediately(true);
-        bubblePicker.setBubbleSize(80);
+        bubblePicker.setBubbleSize(100);
 
         bubblePicker.setListener(new BubblePickerListener() {
             @Override
             public void onBubbleSelected(@NotNull PickerItem item) {
-
-                if ( item.component1().equals("Change Types")){
+                if ( item.component1().equals("Settings")){
                     startActivity(new Intent(getApplicationContext(), settingsActivity.class));
                 }
-
-                if ( item.component1().equals("Selected Types")) {
+                if ( item.component1().equals("Chosen Types")) {
                     final HashMap<String, Pair<String, String>> typesUpdated = viewModel.getAllTypesStored();
-                    final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
-                    alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
-                    alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
 
-                    alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
+                    // if the view model is not empty
+                    if (!typesUpdated.isEmpty())
+                    {
+                        final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
+                        alertDialog2.setTitle("TYPES FROM PREVIOUS SESSION");
+                        alertDialog2.setMessage("Types currently selected: \n" + viewModel.getAllTypesOrdered(typesUpdated).toString());
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(getApplicationContext(), settingsActivity.class));
-                            dialog.cancel();
-                        }
-                    });
+                        alertDialog2.setPositiveButton("CHANGE TYPES ANYWAY", new DialogInterface.OnClickListener() {
 
-                    alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+                                dialog.cancel();
+                            }
+                        });
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
+                        alertDialog2.setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
 
-                    AlertDialog alert1 = alertDialog2.create();
-                    alert1.show();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog alert1 = alertDialog2.create();
+                        alert1.show();
+                    }
+                    else
+                    {
+                        final AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(MainActivity.this);
+                        alertDialog2.setTitle("No types were selected yet!");
+                        alertDialog2.setMessage("You can go and select them now \n");
+                        alertDialog2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(getApplicationContext(), settingsActivity.class));
+                                dialog.cancel();
+                            }
+                        });
+
+                        alertDialog2.setNegativeButton("LATER", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog alert1 = alertDialog2.create();
+                        alert1.show();
+                    }
+
                 }
 
-                if (item.component1().equals("Write Us!"))
+                if (item.component1().equals("Write Us"))
                 {
                     final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                    alert.setTitle("God a question? we'd love to hear from you. Send us a message and we'll respond ASAP");
+                    alert.setTitle("Hi there!");
+                    alert.setMessage("Got a question? we'd love to hear from you. Send us a message and we'll respond ASAP");
 
-                    final EditText name = new EditText(MainActivity.this);
-                    name.setHeight(100);
-                    name.setWidth(340);
-                    name.setGravity(Gravity.LEFT);
+                    LinearLayout layout = new LinearLayout(MainActivity.this);
+                    layout.setOrientation(LinearLayout.VERTICAL);
 
-                    /*final EditText body = new EditText(MainActivity.this);
-                    body.setHeight(100);
-                    body.setWidth(340);
-                    body.setGravity(Gravity.LEFT);*/
+                    final EditText titleBox = new EditText(MainActivity.this);
+                    titleBox.setHint("Title");
+                    layout.addView(titleBox);
 
-                    alert.setView(name);
+                    final EditText descriptionBox = new EditText(MainActivity.this);
+                    descriptionBox.setHint("Description");
+                    layout.addView(descriptionBox);
 
-                    // sending the mail from user to harel's mail address
-                    Intent i = new Intent(Intent.ACTION_SEND);
-                    i.setType("message/rfc822");
-                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"harelyac@gmail.com"});
-                    i.putExtra(Intent.EXTRA_SUBJECT, "put title here");
-                    i.putExtra(Intent.EXTRA_TEXT   , "put body here");
-                    try {
-                        startActivity(Intent.createChooser(i, "Send mail..."));
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-                    }
+                    alert.setView(layout);
+                    alert.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // sending the mail from user to harel's mail address
+                            Intent i = new Intent(Intent.ACTION_SEND);
+                            i.setType("message/rfc822");
+                            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"harelyac@gmail.com"});
+                            i.putExtra(Intent.EXTRA_SUBJECT, titleBox.getText());
+                            i.putExtra(Intent.EXTRA_TEXT   , descriptionBox.getText());
+                            try {
+                                startActivity(Intent.createChooser(i, "Send mail..."));
+                            } catch (android.content.ActivityNotFoundException ex) {
+                                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                    alert.create();
+                    alert.show();
                 }
 
                 if (item.component1().equals("About Us"))
@@ -274,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                     "1.First, decide what function you want to use - " +
                             "our Barcode Scanner or Price Convertor \n \n" +
                     "2.If you use the Convertor (left side) - firstly, you may need to go to " +
-                            "'Change Types' and fill in all the relevant fields; e.g , if you want to convert price from Euro to" +
+                            "'Settings' and fill in all the relevant fields; e.g , if you want to convert price from Euro to" +
                             " Dollar - then select in the 'Currency' field the source and target signs." +
                             "\n Then click  on 'Submit' button and your selection will be saved for later use \n \n" +
                     "3.Now you are ready to convert the types you've selected \n \n" +

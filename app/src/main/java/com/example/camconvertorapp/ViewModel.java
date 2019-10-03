@@ -143,8 +143,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel
             }
             else
             {
-                // why it's not working? #FIXME
-                if ((frequenciesMap.get(type)).second.equals("Select an item..."))
+                if (frequenciesMap.get(type).second.equals("Select an item..."))
                 {
                     isTrue = true;
                 }

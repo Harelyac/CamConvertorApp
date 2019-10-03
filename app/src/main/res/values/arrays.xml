@@ -4,7 +4,7 @@
 
     <string-array name="currencies">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
+        <item>Select an item...</item>
         <item>Dollar ($)</item> // states
         <item>Pound (&#163;)</item> // england
         <item>Euro (&#8364;)</item> // europe
@@ -16,7 +16,7 @@
 
     <string-array name="length">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
+        <item>Select an item...</item>
         <item>Kilometer (km)</item>
         <item>Meter (m)</item>
         <item>Centimeter (cm)</item>
@@ -30,7 +30,7 @@
 
     <string-array name="weights">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
+        <item>Select an item...</item>
         <item>Kilogram (kg)</item>
         <item>Pound (lb)</item>
     </string-array>
@@ -38,7 +38,7 @@
 
     <string-array name="volume">
         <!--using html unicode taken from site https://unicode-table.com/en/#0073 -->
-        <item>Select an Item...</item>
+        <item>Select an item...</item>
         <item>Liter (L)</item>
         <item>Gallon (gal)</item>
     </string-array>
@@ -46,9 +46,9 @@
     <string-array name="title">
 
         <item>Help</item>
-        <item>Change Types</item>
+        <item>Settings</item>
         <item>About Us</item>
-        <item>Selected Types</item>
+        <item>Chosen Types</item>
         <item>Write Us</item>
 
 
@@ -68,11 +68,11 @@
     <integer-array name="colors">
 
 
-        <item>@color/sample_yellow</item>
         <item>@color/theme_yellow_accent</item>
-        <item>@color/sample_yellow</item>
-        <item>@color/theme_yellow_accent</item>
-        <item>@color/sample_yellow</item>
+        <item>@color/text_dark</item>
+        <item>@color/text_dark</item>
+        <item>@color/text_dark</item>
+        <item>@color/text_dark</item>
 
 
 

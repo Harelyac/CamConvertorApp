@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.example.camconvertorapp.locationModule.IpApi;
 import com.example.camconvertorapp.locationModule.Response;
@@ -37,7 +36,6 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static java.lang.Thread.sleep;
 
 public class settingsActivity extends FragmentActivity implements EffectAdapter.AdapterClickCallback {
 
@@ -65,10 +63,11 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         textView = findViewById(R.id.textView);
         textView2 = findViewById(R.id.textView2);
 
+
         // start with initializing local App DB
         db = AppDatabase.getDatabase(this);
 
-        // init view model
+        // read roomdb data into view model
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
 
         // noticing the viewModel all the frequencies which have been already stored
@@ -164,34 +163,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         customAdapter.callback = this;
 
 
-        // restful api for getting current location of phone for default types initialization
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://ipinfo.io/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        IpApi ipApi = retrofit.create(IpApi.class);
-        Call<Response> call = ipApi.getResponse();
-        call.enqueue(new Callback<Response>() {
-            @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                if (!response.isSuccessful()) {
-                    Log.d("", "onResponse: " + response.toString());
-                    return;
-                }
-                // if successful!
-                IpResponse = response.body();
-                setDefaultFreq(IpResponse.timezone, IpResponse.country);
-                Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
-                Log.e("", "Exception: "+Log.getStackTraceString(t));
-            }
-        });
-
 
 
         // when submit is clicked
@@ -242,6 +213,52 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        // read roomdb data into view model
+        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+
+        // noticing the viewModel all the frequencies which have been already stored
+        db.freqDao().getAll().observe(this, new Observer<List<Frequency>>() {
+            @Override
+            public void onChanged(@Nullable final List<Frequency> frequencies) {
+
+                viewModel.setFrequenciesMap(frequencies);
+            }
+        });
+
+        // restful api for getting current location of phone for default types initialization
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://ipinfo.io/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        IpApi ipApi = retrofit.create(IpApi.class);
+        Call<Response> call = ipApi.getResponse();
+        call.enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("", "onResponse: " + response.toString());
+                    return;
+                }
+                // if successful!
+                IpResponse = response.body();
+                setDefaultFreq(IpResponse.timezone, IpResponse.country);
+                Toast.makeText(getApplicationContext(),"Succeeded to get response from server", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Response> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Failed to get response from server", Toast.LENGTH_SHORT).show();
+                Log.e("", "Exception: "+Log.getStackTraceString(t));
+            }
+        });
+    }
+
 
     // set default conversion types source unit based on location - metric or imperial base unit types
     // and currency of country / region only on conversion types that was not set yet
@@ -269,79 +286,75 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             isMetric = false;
         }
 
+
+
+        if(ViewModel.frequenciesMap == null)
+        {
+            return;
+        }
+
         for(String type: typesForConversionList)
         {
-            if(ViewModel.frequenciesMap == null)
+            Frequency newFreq = new Frequency();
+            newFreq.target = "Select an item...";
+
+            if (isMetric)
             {
-                return;
-            }
-            if (!ViewModel.frequenciesMap.containsKey(type))
-            {
-                Frequency newFreq = new Frequency();
-                newFreq.target = "Select an Item...";
-
-
-                if (isMetric)
+                if(type.equals("Currency"))
                 {
-                    if(type.equals("Currency"))
-                    {
-                        newFreq.type = "Currency";
-                        newFreq.source = getCurrency(value);
-//                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "Select an Item..."));
-                    }
-
-                    if(type.equals("Weight")) {
-                        newFreq.type = "Weight";
-                        newFreq.source = "kilogram (kg)";
-//                        frequenciesMap.put(type,new Pair<String, String>("kilogram (kg)", "Select an Item..."));
-                    }
-                    if(type.equals("Length")) {
-                        newFreq.type = "Length";
-                        newFreq.source = "meter (m)";
-//                          frequenciesMap.put(type,new Pair<String, String>("meter (m)", "Select an Item..."));
-                    }
-
-                    if(type.equals("Volume")) {
-                        newFreq.type = "Volume";
-                        newFreq.source = "Liter (L)";
-//                          frequenciesMap.put(type,new Pair<String, String>("Liter (L)", "Select an Item..."));
-                    }
-
-
-                }
-                else
-                {
-                    if(type.equals("Currency")) {
-                        newFreq.type = "Currency";
-
-                        newFreq.source = getCurrency(value);
-//                        frequenciesMap.put(type, new Pair<String, String>(getCurrency(value), "Select an Item..."));
-                    }
-
-                    if(type.equals("Weight")) {
-                        newFreq.type = "Weight";
-
-                        newFreq.source = "pound (lb)";
-//                      frequenciesMap.put(type, new Pair<String, String>("pound (lb)", "Select an Item..."));
-                    }
-
-                    if(type.equals("Length")) {
-                        newFreq.type = "Length";
-                        newFreq.source = "Yard (yd)";
-//                        requenciesMap.put(type, new Pair<String, String>("Yard (yd)", "Select an Item..."));
-                    }
-
-                    if(type.equals("Volume")) {
-                        newFreq.type = "Volume";
-
-                        newFreq.source = "gallon (gal)";
-//                        frequenciesMap.put(type, new Pair<String, String>("gallon (gal)", "Select an Item..."));
-                    }
+                    newFreq.type = "Currency";
+                    newFreq.source = getCurrency(value);
+//                        frequenciesMap.put(type,new Pair<String, String>(getCurrency(value), "Select an item..."));
                 }
 
-                insertToLocalDB(newFreq);
+                if(type.equals("Weight")) {
+                    newFreq.type = "Weight";
+                    newFreq.source = "Kilogram (kg)";
+//                        frequenciesMap.put(type,new Pair<String, String>("kilogram (kg)", "Select an item..."));
+                }
+                if(type.equals("Length")) {
+                    newFreq.type = "Length";
+                    newFreq.source = "Meter (m)";
+//                          frequenciesMap.put(type,new Pair<String, String>("meter (m)", "Select an item..."));
+                }
+
+                if(type.equals("Volume")) {
+                    newFreq.type = "Volume";
+                    newFreq.source = "Liter (L)";
+//                          frequenciesMap.put(type,new Pair<String, String>("Liter (L)", "Select an item..."));
+                }
+
 
             }
+            else {
+                if (type.equals("Currency")) {
+                    newFreq.type = "Currency";
+
+                    newFreq.source = getCurrency(value);
+//                        frequenciesMap.put(type, new Pair<String, String>(getCurrency(value), "Select an item..."));
+                }
+
+                if (type.equals("Weight")) {
+                    newFreq.type = "Weight";
+
+                    newFreq.source = "Pound (lb)";
+//                     frequenciesMap.put(type, new Pair<String, String>("pound (lb)", "Select an item..."));
+                }
+
+                if (type.equals("Length")) {
+                    newFreq.type = "Length";
+                    newFreq.source = "Yard (yd)";
+//                        requenciesMap.put(type, new Pair<String, String>("Yard (yd)", "Select an item..."));
+                }
+
+                if (type.equals("Volume")) {
+                    newFreq.type = "Volume";
+
+                    newFreq.source = "Gallon (gal)";
+//                        frequenciesMap.put(type, new Pair<String, String>("gallon (gal)", "Select an item..."));
+                }
+            }
+                insertToLocalDB(newFreq, true);
         }
     }
 
@@ -351,9 +364,6 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         switch(country)
         {
             case "IL":
-            {
-                return "NIS (₪)";
-            }
             case "US":
             {
                 return "Dollar ($)";
@@ -379,7 +389,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         }
     }
 
-    // create a frequency after the user has pressed the type and then put
+    // display the current type of source and target spinners and prepare new frequency to be stored instead
     public void setTypesSelected(final String type, TextView textView1, TextView textView2, final Frequency newFrequency) {
         int array = 0;
 
@@ -395,8 +405,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             if (ViewModel.frequenciesMap.containsKey("Currency")) {
                 int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Currency"));
                 mTarget.setSelection(spinnerPosition);
-
-                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Currency"));
+                int spinnerPosition2 = adapter2.getPosition(ViewModel.getTargetByFrequencyType("Currency"));
                 mTarget2.setSelection(spinnerPosition2);
             }
 
@@ -416,8 +425,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             if (ViewModel.frequenciesMap.containsKey("Weight")) {
                 int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Weight"));
                 mTarget.setSelection(spinnerPosition);
-
-                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Weight"));
+                int spinnerPosition2 = adapter2.getPosition(ViewModel.getTargetByFrequencyType("Weight"));
                 mTarget2.setSelection(spinnerPosition2);
             }
 
@@ -429,15 +437,13 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
             mTarget.setAdapter(adapter);
             adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             mTarget2.setAdapter(adapter2);
             if (ViewModel.frequenciesMap.containsKey("Length")) {
                 int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Length"));
                 mTarget.setSelection(spinnerPosition);
-
-                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Length"));
+                int spinnerPosition2 = adapter2.getPosition(ViewModel.getTargetByFrequencyType("Length"));
                 mTarget2.setSelection(spinnerPosition2);
             }
 
@@ -450,20 +456,17 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getApplicationContext(), array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
             mTarget.setAdapter(adapter);
             adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             mTarget2.setAdapter(adapter2);
             if (ViewModel.frequenciesMap.containsKey("Volume")) {
                 int spinnerPosition = adapter.getPosition(ViewModel.getSourceByFrequencyType("Volume"));
                 mTarget.setSelection(spinnerPosition);
-
-                int spinnerPosition2 = adapter.getPosition(ViewModel.getTargetByFrequencyType("Volume"));
+                int spinnerPosition2 = adapter2.getPosition(ViewModel.getTargetByFrequencyType("Volume"));
                 mTarget2.setSelection(spinnerPosition2);
             }
 
         }
-
 
 
         // now choosing the signs from Spinners
@@ -471,58 +474,48 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String currency_selected_source = parent.getItemAtPosition(position).toString();
-                    Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
-                    newFrequency.source = currency_selected_source;
-                    getTableAsString(db,"Frequency");
-                    insertToLocalDB(newFrequency);
-                }
+                String currency_selected_source = parent.getItemAtPosition(position).toString();
+                Toast.makeText(settingsActivity.this, "Selected source type: " + currency_selected_source, Toast.LENGTH_SHORT).show();
+                newFrequency.source = currency_selected_source;
+                newFrequency.target = "Select an item...";
+                insertToLocalDB(newFrequency, false);
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                    Toast.makeText(settingsActivity.this,"Select source type! ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(settingsActivity.this, "Select source type! ", Toast.LENGTH_SHORT).show();
 
             }
 
         });
 
-        //now deal with target currency and save on room
-
-        textView2.setText("choose the target " + type + " type:");//TODO maybe change instruction
+        textView.setText("choose the source " + type + " type:");
+        textView2.setText("choose the target " + type + " type:");
 
 
         mTarget2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                //first - delete the previous type was stored
-//                deleteByType(type);
                 String currency_selected_target = parent.getItemAtPosition(position).toString();
                 Toast.makeText(settingsActivity.this, "Selected target type: " + currency_selected_target, Toast.LENGTH_SHORT).show();
                 newFrequency.target = currency_selected_target;
-                insertToLocalDB(newFrequency);
-
+                insertToLocalDB(newFrequency, false);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(settingsActivity.this,"Select target type! ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(settingsActivity.this, "Select target type! ", Toast.LENGTH_SHORT).show();
             }
 
         });
-
     }
-
 
     /**these methods manage the insertion and deletion from room db**/
-    public void insertToLocalDB(Frequency newFrequency) {
-        new insertLocalAsyncTask(db.freqDao()).execute(newFrequency);
+    public void insertToLocalDB(Frequency newFrequency, boolean fromDefault) {
+        new insertLocalAsyncTask(db.freqDao(), fromDefault).execute(newFrequency);
     }
 
-    //debug purposes
-    void deleteAll(){
-        new deleteALLAsyncTask(db.freqDao()).execute();
-    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -558,11 +551,7 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
     public void AdapterClickCallback(String[] freq, int id,  View view) {
 
         Frequency newFrequency = new Frequency();
-        // animate both spinners for user to notice there are fields to choose at top of screen!
 
-        if (rope != null) {
-            rope.stop(true);
-        }
 
         if (typesForConversionList[(int) id].equals("Currency")) {
             setTypesSelected("Currency", textView, textView2, newFrequency );
@@ -570,15 +559,9 @@ public class settingsActivity extends FragmentActivity implements EffectAdapter.
         if (typesForConversionList[(int) id].equals("Weight")) {
             setTypesSelected("Weight", textView, textView2, newFrequency );
         }
-        if(typesForConversionList[(int) id].equals("Temperature")) {
-
-            setTypesSelected("Temperature", textView, textView2, newFrequency );
-
-        }
         if(typesForConversionList[(int) id].equals("Length")) {
 
             setTypesSelected("Length", textView, textView2, newFrequency );
-
         }
         if(typesForConversionList[(int) id].equals("Volume")) {
 
