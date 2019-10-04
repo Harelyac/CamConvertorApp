@@ -15,6 +15,7 @@ package com.example.camconvertorapp.barcodeScanningModule;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,8 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -103,6 +106,10 @@ public class BarcodeScanningProcessor extends VisionProcessorBase<List<FirebaseV
                 // start scraping using bg thread
                 Scrape_Asynctasks task = new Scrape_Asynctasks();
                 task.execute(url);
+                if(Scrape_Asynctasks.imgurl != null)
+                {
+                    cameraActivity.displayImg(url); //fixme should display in camera activity with "this"
+                }
 
                 graphicOverlay.add(barcodeGraphic);
             }

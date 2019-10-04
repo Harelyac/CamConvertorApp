@@ -15,6 +15,8 @@ import java.io.IOException;
 
 public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
 {
+    public static Object imgurl = "";
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -45,8 +47,11 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
             if (image != null)
             {
                 Log.i("IMAGE", image.text());
-                String url = image.absUrl("src");
+                String url = image.baseUri();
                 Log.i("URL", url);
+                imgurl = url;
+
+
             }
 
 

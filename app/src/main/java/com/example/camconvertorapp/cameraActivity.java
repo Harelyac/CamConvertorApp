@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.camconvertorapp.barcodeScanningModule.BarcodeScanningProcessor;
@@ -14,6 +15,8 @@ import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
 import com.example.camconvertorapp.textRecognitionModule.TextRecognitionProcessor;
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,7 @@ public class cameraActivity extends AppCompatActivity
     private GraphicOverlay graphicOverlay;
 
     public static EditText detectedValue;
+    public static ImageView imageView;
     Response fixerResponse;
 
     private String baseCurrency = "ILS";
@@ -68,6 +72,8 @@ public class cameraActivity extends AppCompatActivity
         // load views
         detectedValue = findViewById(R.id.detectedValue);
         detectedValue.setInputType(0);
+
+        imageView  = findViewById(R.id.imag);
 
         // generate the object
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
@@ -132,6 +138,12 @@ public class cameraActivity extends AppCompatActivity
         } else {
             getRuntimePermissions();
         }
+
+    }
+
+    public void displayImg(String url)
+    {
+        Picasso.with(this).load(url).into(cameraActivity.imageView); //Fixme what the hell
 
     }
 
