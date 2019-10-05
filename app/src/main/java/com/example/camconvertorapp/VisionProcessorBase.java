@@ -27,6 +27,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.ByteBuffer;
 
 import androidx.annotation.GuardedBy;
@@ -117,9 +119,15 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                         new OnSuccessListener<T>() {
                             @Override
                             public void onSuccess(T results) {
-                                VisionProcessorBase.this.onSuccess(originalCameraImage, results,
-                                        metadata,
-                                        graphicOverlay);
+                                try {
+                                    VisionProcessorBase.this.onSuccess(originalCameraImage, results,
+                                            metadata,
+                                            graphicOverlay);
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 processLatestImage(graphicOverlay);
                             }
                         })
@@ -148,7 +156,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
             @Nullable Bitmap originalCameraImage,
             @NonNull T results,
             @NonNull FrameMetadata frameMetadata,
-            @NonNull GraphicOverlay graphicOverlay);
+            @NonNull GraphicOverlay graphicOverlay) throws IOException;
 
     protected abstract void onFailure(@NonNull Exception e);
 }

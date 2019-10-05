@@ -11,11 +11,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
 {
-    public static Object imgurl = "";
+    public static String imgurl = "";
 
     @Override
     protected void onPreExecute() {
@@ -33,30 +35,25 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
                 .userAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                 .timeout(5000).get();
 
-
-            // get the only one image block
-            Elements ImageBlocks = doc.select(".GNxIwf");
-            Element ImageBlock = ImageBlocks.first();
-
-            Log.i("IMAGE_BLOCK", ImageBlock.text());
-
-            // gets first image in that block
-            Elements images = ImageBlock.select("img[id^=dimg_]");
-            Element image = images.first();
-
-            if (image != null)
-            {
-                Log.i("IMAGE", image.text());
-                String url = image.baseUri();
-                Log.i("URL", url);
-                imgurl = url;
-
-
+            Pattern pattern = Pattern.compile("data:image.*?'");
+            Elements scripts = doc.select("script");
+            for (Element script : scripts) {
+                if (script.html().contains("data:image") && script.html().contains("dimg_"))
+                {
+                    Log.i("INSIDE", imgurl);
+                    Matcher matcher = pattern.matcher(script.html());
+                    if(matcher.find())
+                    {
+                        imgurl = script.html().substring(matcher.start(), matcher.end());
+                        Log.i("REGEX", imgurl);
+                        int len = imgurl.length();
+                        Log.i("REGEXLEN", Integer.toString(len));
+                        break;
+                    }
+                }
             }
 
 
-
-            // \bprice\b.*\d+ FIXME use regex
 
             Elements links = doc.select(".rc");
 

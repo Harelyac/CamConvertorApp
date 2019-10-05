@@ -1,32 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".MainActivity">
-
-        <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/theme_blue_text_inverse"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:visibility="visible">
-
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                style="@style/MaterialAnimations.TextAppearance.Title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/theme_blue_text_inverse"
-                android:elevation="@dimen/elevation_header"
-                android:visibility="visible" />
-        </com.google.android.material.appbar.AppBarLayout>
-
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#647788"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/title"
@@ -52,6 +33,7 @@
 
     </TextView>
 
+
     <com.eftimoff.androipathview.PathView
         android:id="@+id/path"
         android:layout_width="189dp"
@@ -62,6 +44,24 @@
         app:pathColor="@color/colorPrimaryDark"
         app:pathWidth="5dp"
         app:svg="@raw/camera" />
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_blue_text_inverse"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:visibility="visible">
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/MaterialAnimations.TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/theme_blue_text_inverse"
+            android:elevation="@dimen/elevation_header"
+            android:visibility="visible" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.igalata.bubblepicker.rendering.BubblePicker
         android:id="@+id/picker"
@@ -77,8 +77,7 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="24dp"
         app:tbm_backgroundColor="@color/theme_yellow_accent"
-        app:tbm_menuAnchor="bottom"
-        >
+        app:tbm_menuAnchor="bottom">
 
 
         <ImageView
@@ -88,14 +87,15 @@
             android:layout_weight="1"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:src="@drawable/convert1"
-            />
+            android:src="@drawable/convert1" />
+
+
 
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            />
+            android:layout_weight="1" />
+
 
         <ImageView
             android:id="@+id/item2"
@@ -105,6 +105,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:src="@drawable/barcode513" />
+
 
 
     </com.michaldrabik.tapbarmenulib.TapBarMenu>
