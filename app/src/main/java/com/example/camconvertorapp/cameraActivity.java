@@ -78,7 +78,7 @@ public class cameraActivity extends AppCompatActivity
         detectedValue = findViewById(R.id.detectedValue);
         detectedValue.setInputType(0);
         //imageView  = findViewById(R.id.imag);
-        //webView = findViewById(R.id.web);
+        webView = findViewById(R.id.web);
 
         // generate the object
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);

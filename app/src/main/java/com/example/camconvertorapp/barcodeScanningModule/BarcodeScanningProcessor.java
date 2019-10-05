@@ -103,7 +103,7 @@ public class BarcodeScanningProcessor extends VisionProcessorBase<List<FirebaseV
             if (!value.isEmpty())
             {
                 // scrape google search using Jsoup on bg thread using Async task
-                url = url + "885178979613" + " price" + "&num10";
+                url = url + value + " price" + "&num10";
 
                 Log.i("BEFORE", "ASYNC");
 
@@ -114,6 +114,10 @@ public class BarcodeScanningProcessor extends VisionProcessorBase<List<FirebaseV
                 if (!Scrape_Asynctasks.imgurl.equals(""))
                 {
                     cameraActivity.webView.loadUrl(Scrape_Asynctasks.imgurl);
+                }
+                if (!Scrape_Asynctasks.price.equals(""))
+                {
+                    cameraActivity.detectedValue.setText(Scrape_Asynctasks.price);
                 }
                 // call draw method
                 //camera.drawImage();

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
 {
     public static String imgurl = "";
+    public static String price = "";
 
     @Override
     protected void onPreExecute() {
@@ -56,6 +57,8 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
 
 
             Elements links = doc.select(".rc");
+            pattern = Pattern.compile("price[ ]*\\:?[ ]*[$|₪|€|£]?[ ]*\\d+[$|₪|€|£]?");
+
 
             for (Element link : links)
             {
@@ -68,11 +71,22 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
                 Elements bodies = link.select(".s");
                 String body = bodies.text();
                 String lowered = body.toLowerCase();
+                Matcher matcher = pattern.matcher(lowered);
+                if(matcher.find())
+                {
+                    Log.i("PRICE,1", lowered.substring(matcher.start(),matcher.end()));
+
+                    price = lowered.substring(matcher.start(),matcher.end());
+                    return "finished";
+                }
+
                 int start = lowered.indexOf("price");
 
                 if (start != -1)
                 {
-                    Log.i("PRICE", body.substring(start+6, start+10));
+                    Log.i("PRICE,2", body.substring(start+6, start+10));
+                    price = body.substring(start+6, start+10);
+
                 }
 
                 Log.i("Title: ", title + "\n");
