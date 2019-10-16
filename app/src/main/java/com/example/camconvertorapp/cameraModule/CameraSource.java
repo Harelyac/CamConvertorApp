@@ -18,10 +18,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -32,10 +29,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-import com.google.android.gms.common.data.DataBuffer;
 import com.google.android.gms.common.images.Size;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.nio.ByteBuffer;

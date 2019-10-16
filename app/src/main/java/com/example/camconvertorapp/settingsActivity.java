@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.camconvertorapp.camconvertorapp.R;
 import com.daimajia.androidanimations.library.YoYo;
 import com.example.camconvertorapp.locationModule.IpApi;
 import com.example.camconvertorapp.locationModule.Response;

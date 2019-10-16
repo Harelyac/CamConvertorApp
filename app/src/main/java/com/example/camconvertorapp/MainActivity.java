@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
+import com.camconvertorapp.camconvertorapp.R;
 import com.eftimoff.androipathview.PathView;
 
 import com.igalata.bubblepicker.BubblePickerListener;

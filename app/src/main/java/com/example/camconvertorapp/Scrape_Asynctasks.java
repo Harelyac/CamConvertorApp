@@ -45,7 +45,7 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
                     Matcher matcher = pattern.matcher(script.html());
                     if(matcher.find())
                     {
-                        imgurl = script.html().substring(matcher.start(), matcher.end());
+                        imgurl = script.html().substring(matcher.start(), matcher.end() - 1);
                         Log.i("REGEX", imgurl);
                         int len = imgurl.length();
                         Log.i("REGEXLEN", Integer.toString(len));
@@ -84,8 +84,8 @@ public class Scrape_Asynctasks extends AsyncTask<String, Integer, String>
 
                 if (start != -1)
                 {
-                    Log.i("PRICE,2", body.substring(start+6, start+10));
-                    price = body.substring(start+6, start+10);
+                    Log.i("PRICE,2", body.substring(start, start+10));
+                    price = body.substring(start, start+10);
 
                 }
 

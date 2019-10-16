@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.camconvertorapp.camconvertorapp.R;
 import com.example.camconvertorapp.barcodeScanningModule.BarcodeScanningProcessor;
 import com.example.camconvertorapp.cameraModule.CameraSource;
 import com.example.camconvertorapp.cameraModule.CameraSourcePreview;
@@ -19,7 +20,6 @@ import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.example.camconvertorapp.currencyModule.FixerApi;
 import com.example.camconvertorapp.currencyModule.Response;
 import com.example.camconvertorapp.textRecognitionModule.TextRecognitionProcessor;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;

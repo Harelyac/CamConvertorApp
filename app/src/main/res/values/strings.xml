@@ -98,7 +98,7 @@
     <string name="harel">Harel</string>
     <string name="todo">TODO</string>
     <string name="name">Name</string>
-    <string name="detected_value">Detected Value:</string>
+    <string name="detected_value">Detected Values:</string>
     <string name="submit">Submit</string>
     <string name="select_target_type">Select target type:</string>
     <string name="select_source_type">Select source type:</string>

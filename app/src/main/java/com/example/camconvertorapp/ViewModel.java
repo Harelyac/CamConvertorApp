@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import kotlin.Triple;
-import com.example.camconvertorapp.settingsActivity;
 
 public class ViewModel extends androidx.lifecycle.ViewModel
 {

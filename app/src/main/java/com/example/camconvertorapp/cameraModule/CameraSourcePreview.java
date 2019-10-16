@@ -22,8 +22,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
-import com.example.camconvertorapp.cameraModule.CameraSource;
-import com.example.camconvertorapp.cameraModule.GraphicOverlay;
 import com.google.android.gms.common.images.Size;
 
 import java.io.IOException;

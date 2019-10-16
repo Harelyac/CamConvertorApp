@@ -14,17 +14,12 @@
 package com.example.camconvertorapp.barcodeScanningModule;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.provider.MediaStore;
 
-import android.util.Base64;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
-import com.example.camconvertorapp.MainActivity;
 import com.example.camconvertorapp.Scrape_Asynctasks;
 import com.example.camconvertorapp.VisionProcessorBase;
 import com.example.camconvertorapp.cameraActivity;
@@ -41,7 +36,6 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 
@@ -99,6 +93,7 @@ public class BarcodeScanningProcessor extends VisionProcessorBase<List<FirebaseV
 
 
             String url = "https://www.google.com/search?q=";
+
 
             if (!value.isEmpty())
             {
